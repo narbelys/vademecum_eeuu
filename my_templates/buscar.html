@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block meta_title %}
+<meta name="description" content="Lista y guía de medicamentos, enfermedades, patologías, principios activos, clases terapéuticas, laboratorios.">
+<meta name="keywords" content="vademecum, guia de medicamentos, enfermedades, principios activos, clases terapeuticas, marcas, laboratorios, patologias, drogas, listas, rankings, buscador, biblioteca, precios, farmacias, clinicas, diagnosticos, medicina, farmacia">
+
+<title>PRX Vademécum - Directorio de medicamentos, patologías y enfermedades</title>
+{% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+
+	var directorio = []
+
+	$(document).ready(function() {
+
+		$('#lista').append('<img id="loader" style="display:block;margin-left:auto;margin-right:auto;" src="{{STATIC_URL}}images/loader-ajax.gif">');
+
+		$.ajax({
+			url: "/Buscar/buscar",
+			data: { buscar:{% if buscar %}"{{buscar}}"{% else %}''{% endif %} },
+			dataType: "json",
+			success: function(data) {
+
+			for(x in data){
+				directorio[x] = [data[x].id_vademecum, data[x].nombre];
+			}
+				//alert(JSON.stringify(directorio));
+				return false;
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				if (errorThrown!="")	alert(errorThrown+' : '+textStatus);
+			},
+			crossDomain: false,
+			type: "POST",
+		}).done(function(){paginar(directorio);},function(){ $('#loader').remove();});
+	});
+
+</script>
+
+{% endblock %}
+
+{% block titulo %}
+ <div class="page-header">
+  <h2>RESULTADOS DE LA BUSQUEDA:</h2>
+</div>
+{% endblock %}
+
+{% block contenido %}
+ <input type="text" style="display:none" value="{{pais.pais_nombre}}" id="pais">
+  {% if buscar %}
+    <br>
+  <div class="lista">
+    <ul id="lista" class="lista-detalles">
+    </ul>
+  </div>
+  {% else %}
+    <p>La búsqueda no obtuvo ningún resultado.</p>
+  {% endif %}
+
+  {% include "elements/paginacion.html" %}
+
+{% endblock %}

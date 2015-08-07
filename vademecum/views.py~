@@ -1,0 +1,905 @@
+# -*- coding: utf-8 -*-
+
+import string
+import json
+
+# Django libs
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import get_object_or_404, render_to_response, redirect
+from django.template import RequestContext
+from django.db.models import Q, Count, Sum
+from django.http import HttpResponse, Http404
+from django.utils import simplejson
+from django.core import serializers
+from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
+
+# Modelos
+from vademecum.models import AuditRelpatologia, ClaseTerapeutica, PrincipioActivo, PrincipioGrupo, PrincipioSubclase, Medicamento, MedicamentoPresentacion, Laboratorio, TipoDiagnostico
+from vademecum.models import SintomaEnfermedad, Sintoma, SubclaseNivel3 , SubclaseNivel2 , CausaEnfermedad, Causa, RankingClase, RankingSubclase, RankingMarca, RankingMedicamento, RankingPrincipioActivo, RankingEnfermedad
+from vademecum.models import CausaEnfermedad, Causa, TipoDiagnosticorelacion, TipoDiagnostico2, AuditMedicamento, Clinica, Pais
+import smtplib
+from email.MIMEText import MIMEText
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
+
+
+from django.core.mail import send_mail
+
+from django.core.mail import send_mail, BadHeaderError
+from email.mime.multipart import MIMEMultipart
+from django.core.mail import EmailMessage
+from django.core import mail
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
+
+def contacto(request):
+    if request.is_ajax():
+        comentario = request.POST.get('comentario',None)
+        print "holaaaaa"
+        combinado = 'Mensaje de FB vademecum \r\n\r\nComentario: '+comentario
+        msg = MIMEText(combinado.encode('utf-8'), 'plain', 'UTF-8')
+        msg['From']= "vademecum"
+#        msg['MIME-Version']="1.0"
+        Subject="Mensaje de FB"
+#        msg['Content-Type'] = "text/html; charset=utf-8"
+#        msg['Content-Transfer-Encoding'] = "quoted-printable"
+        #msg = 'From: '+nombre+' <'+email+'>\r\nTo: miguelmiguel19@gmail.com\r\n\r\n'+comentario
+                    
+        if comentario:
+            try:
+                #send_mail('(Comentario) PCA-Audit', nombre+' <'+email+'>. Comentario: '+comentario, email,['miguel.ambrosio@pcaaudit.com'], fail_silently=False)
+                
+                conexion = mail.get_connection()
+                conexion.password = settings.ALT_EMAIL_HOST_PASSWORD
+                conexion.username = settings.ALT_EMAIL_HOST_USER
+                conexion.host = settings.ALT_EMAIL_HOST
+                conexion.port = settings.EMAIL_PORT
+                conexion.use_tls = settings.EMAIL_USE_TLS
+                conexion.open()
+
+                #\"url\": \"https://pcafarma.com\" Si se quiere agregar landing page poner esto dentro del settings del header
+                correo = EmailMessage(Subject, combinado, "Contacto FB <contacto@prxcontrolsolutions.com>", ['contacto@pcafarma.com'], headers = {"X-SMTPAPI": "{\"filters\": {\"subscriptiontrack\": {\"settings\":{\"enable\": 1, \"text/html\": \"Si usted quiere darse de baja y dejar de recibir estos correos, por favor haga <% click aqui %>.\" , \"text/plain\": \"Si usted quiere darse de baja y dejar de recibir estos correos, por favor haga click aqui <% %>.\" }}}}"} ,connection=conexion )
+
+                correo.send()
+                conexion.close()
+#                server = smtplib.SMTP_SSL('smtp.gmail.com',465)
+#                server.login('info@pcaaudit.com', 'prxinfo2012')
+#                server.sendmail(email,['info@pcaaudit.com'], str(msg))
+#                server.quit()
+                return HttpResponse(json.JSONEncoder().encode({"comentario":comentario}), mimetype="application/json")
+            except (smtplib.SMTPAuthenticationError):#BadHeaderError:
+                print 'Error de header'
+    else:
+        raise Http404
+
+
+def crear_id_vademecum(nombre):
+	"""Quita los caracteres especiales de los nombres de los datos en cuestión."""
+	return nombre.replace(" ", "_").replace(",", "_").replace("/", "_").replace(".", "").\
+		replace(u"´", "").replace("-", "_").replace("+", "_").replace("%", "").replace(u"°", "").\
+		replace("*", "").replace("&", "and").replace("[", "").replace("]", "").replace("{", "").\
+		replace("}", "").replace("'","").replace('"',"").lower()
+
+def vade_unique(nombre):
+	"""Crea un id_vademecum único a partir del nombre del elemento en cuestion, para nombres repetidos se añade _ al final"""
+	
+	next = True
+	dummy =''
+
+	while next:
+		string = nombre+dummy
+		id_vademecum = crear_id_vademecum(string)
+
+		
+		#elems = Medicamento.objects.filter(id_vademecum=id_vademecum)
+		#elems = MedicamentoPresentacion.objects.filter(id_vademecum=id_vademecum)
+		#elems = PrincipioGrupo.objects.filter(id_vademecum=id_vademecum)
+		#elems = SubclaseNivel2.objects.filter(id_vademecum=id_vademecum)
+		#elems = ClaseTerapeutica.objects.filter(id_vademecum=id_vademecum)
+		#elems = TipoDiagnostico.objects.filter(id_vademecum=id_vademecum)
+		#elems = Laboratorio.objects.filter(id_vademecum=id_vademecum)
+		#elems = Clinica.objects.filter(url_vademecum=id_vademecum)
+
+		next = len(elems) > 0
+		dummy += "_"
+
+	return id_vademecum
+
+# HOME
+def index(request, nombre=None):
+    print nombre
+    """
+     Para crear los id_vademecum, descomentar uno por uno, y descomentar la linea correspondiente según el caso en vade_unique
+    """
+
+    #marcas = Medicamento.objects.all()
+    #for marca in marcas:
+        #print "procesando ",marca.nombre_medicamento
+        #marca.id_vademecum = vade_unique(marca.nombre_medicamento)
+        #marca.save()
+
+    #meds = MedicamentoPresentacion.objects.all().order_by('nombre_presentacion')
+    #for med in meds:
+        #print "procesando ",med.nombre_presentacion
+        #med.id_vademecum = vade_unique(med.nombre_presentacion +"_"+med.id_laboratorio.abrev_laboratorio)
+        #med.save()
+        ### OJO: NO DESCOMENTAR!!!
+        ### Se utilizó join en vez de concatenación de string buscando mayor eficiencia y NO se logró!
+        ###med.id_vademecum = vade_unique( u"_".join([med.nombre_presentacion, med.id_laboratorio.abrev_laboratorio]) )	
+
+    #principios = PrincipioGrupo.objects.all()
+    #for prin in principios:
+        #print "procesando ",prin.prigrup_nombre
+        #prin.id_vademecum = vade_unique(prin.prigrup_nombre)
+        #prin.save()	
+
+    ##Para Subclase 2 se debe correr el script con los nombres de la base de datos anterior
+    #subclases = SubclaseNivel2.objects.all()
+    #for subclase in subclases:
+        #print "procesando ",subclase.titulo_vademecum
+        #subclase.id_vademecum = vade_unique(subclase.titulo_vademecum)
+        #subclase.save()	
+
+    #clases = ClaseTerapeutica.objects.all()
+    #for clase in clases:
+        #print "procesando ",clase.nombre_clase
+        #clase.id_vademecum = vade_unique(clase.nombre_clase)
+        #clase.save()
+
+    #tds = TipoDiagnostico.objects.all()
+    #for td in tds:
+        #print "procesando ",td.nombre_diagnostico
+        #td.id_vademecum = vade_unique(td.nombre_diagnostico)
+        #td.save()
+
+    #labs = Laboratorio.objects.all()
+    #for lab in labs:
+        #print "procesando ",lab.nombre_laboratorio
+        #lab.id_vademecum = vade_unique(lab.nombre_laboratorio)
+        #lab.save()
+
+    #clinicas = Clinica.objects.all()
+    #for clinica in clinicas:
+        #print "procesando ",clinica.nombre_clinica
+        #clinica.url_vademecum = vade_unique(clinica.nombre_clinica)
+        #clinica.save()
+
+
+    #	nombradores = [
+    #		{ 'modelo': Medicamento            , 'nombrador': lambda marca   : marca.nombre_medicamento                                             },
+    #		{ 'modelo': MedicamentoPresentacion, 'nombrador': lambda med     : med.nombre_presentacion + "_" + med.id_laboratorio.abrev_laboratorio },
+    #		{ 'modelo': PrincipioGrupo         , 'nombrador': lambda prin    : prin.prigrup_nombre                                                  },
+    #		{ 'modelo': SubclaseNivel2         , 'nombrador': lambda subclase: subclase.titulo_vademecum                                            },
+    #		{ 'modelo': ClaseTerapeutica       , 'nombrador': lambda clase   : clase.nombre_clase                                                   },
+    #		{ 'modelo': TipoDiagnostico        , 'nombrador': lambda td      : td.nombre_diagnostico                                                },
+    #		{ 'modelo': Laboratorio            , 'nombrador': lambda lab     : lab.nombre_laboratorio                                               },
+    #	]
+    #
+    #	for nombrador in nombradores:
+    #		for objeto in nombrador['modelo'].objects.all()
+    #			objeto.id_vademecum = vade_unique(clase, nombrador['nombrador'](objeto))
+    #			objeto.save()
+
+
+    top10meds = RankingMedicamento.objects.all().order_by('-total')[:10]
+    top10enfs = RankingEnfermedad.objects.all().order_by('-total')[:10]
+    top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    top20marcas_aux=[]
+    for i in top20marcas:
+        top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+	
+    return render_to_response('home.html', {"pais":nombre, "meds":top10meds, "enfs":top10enfs, "top20marcas":top20marcas}, context_instance=RequestContext(request))
+
+@ensure_csrf_cookie
+def buscar(request, nombre=None):
+	buscar = request.GET.get("buscar", None)
+    	top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    	top20marcas_aux=[]
+    	for i in top20marcas:
+        	top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    	top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+
+	return render_to_response('buscar.html', {"pais":nombre, "top20marcas":top20marcas, "buscar":buscar}, context_instance=RequestContext(request))
+
+def ajax_buscar(request, nombre=None):
+	if request.is_ajax():
+		buscar = request.POST.get("buscar", None)
+
+		resultados = []
+
+		if buscar:
+			principios = PrincipioGrupo.objects.filter(prigrup_nombre__icontains=buscar)
+			if nombre:
+				pais=Pais.objects.get(pais_nombre="PANAMA")
+				meds = MedicamentoPresentacion.objects.filter(nombre_presentacion__icontains=buscar, pais=pais)
+			else:
+				pais=Pais.objects.get(pais_id=3)
+				meds = MedicamentoPresentacion.objects.filter(nombre_presentacion__icontains=buscar, pais=pais)
+			enfs = TipoDiagnostico.objects.filter(nombre_diagnostico__icontains=buscar)
+			clinicas = Clinica.objects.filter(nombre_clinica__icontains=buscar)
+			
+			results = []
+			for prin in principios:
+				results.append( dict(nombre=prin.prigrup_nombre, id_vademecum="/PrincipiosActivos/"+prin.id_vademecum) )
+
+			for med in meds:
+				results.append( dict(nombre=med.nombre_presentacion+" - "+med.id_laboratorio.abrev_laboratorio, id_vademecum="/Medicamentos/"+med.id_vademecum) )
+
+			for enf in enfs:
+				results.append( dict(nombre=enf.nombre_diagnostico, id_vademecum="/Enfermedades/"+enf.id_vademecum) )
+				
+			for clinica in clinicas:
+				#Cambiar clinica.id_clinica por id_vademecum
+				results.append( dict(nombre=clinica.nombre_clinica, id_vademecum="/Clinicas/"+clinica.url_vademecum) )
+
+			# Resultados por orden alfabético
+			resultados = sorted(results, key=lambda k: k['nombre']) 
+
+			json_data = simplejson.dumps(resultados)
+			return HttpResponse(json_data, mimetype="application/json")
+
+		return HttpResponse(serializers.serialize('json', resultados, ensure_ascii=False), mimetype="application/json")
+	else:
+		raise Http404
+
+
+# INDEX
+@ensure_csrf_cookie
+def blogs(request):
+    	top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    	top20marcas_aux=[]
+    	for i in top20marcas:
+        	top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    	top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+	return render_to_response('blogs.html',{"top20marcas":top20marcas}, context_instance=RequestContext(request))
+
+@ensure_csrf_cookie
+def clinicas(request,id=None):
+	
+	if id==None:
+    		top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    		top20marcas_aux=[]
+    		for i in top20marcas:
+        		top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    		top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+
+		clinicas = Clinica.objects.all().order_by('nombre_clinica')
+		return render_to_response('clinicas.html',{"clinicas":clinicas, "top20marcas":top20marcas}, context_instance=RequestContext(request))
+	else:
+		print "HOLAAAAAA"
+    		top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    		top20marcas_aux=[]
+    		for i in top20marcas:
+        		top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    		top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+		clinica =get_object_or_404( Clinica, url_vademecum=id )
+			
+		#return render_to_response('clinicasPrueba.html',{"clinica":clinica, "top20marcas":top20marcas}, context_instance=RequestContext(request))
+
+		return render_to_response('ver_clinica.html',{"clinica":clinica, "top20marcas":top20marcas}, context_instance=RequestContext(request))
+
+@ensure_csrf_cookie
+def otros_paises(request, nombre=None, letra=None):
+    print nombre
+    top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    top20marcas_aux=[]
+    for i in top20marcas:
+        top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+    return render_to_response('otros_paises.html',{"pais":nombre, "letra":letra, "letters":string.uppercase, "top20marcas":top20marcas}, context_instance=RequestContext(request))
+
+def ajax_marcas_paises(request):
+    pais_otros=Pais.objects.filter(pais_id__in=[1,2])
+
+    if request.is_ajax():
+        marcas = []
+        ranking = request.POST.get("ranking", None)
+        if ranking:
+            marcas_rank = RankingMarca.objects.all().order_by('-total')
+            for marca in marcas_rank:
+                marcas.append( marca.marca )
+        else:
+            pais_otros=Pais.objects.filter(pais_id__in=[1,2])
+            letra = request.POST.get("letra", None)
+            if letra:
+                marcas=MedicamentoPresentacion.objects.filter(id_medicamento__nombre_medicamento__startswith=letra, pais__in=pais_otros).order_by('id_medicamento__nombre_medicamento').values('id_medicamento__nombre_medicamento', 'pais__pais_nombre', 'pais', 'pais__flag', 'pais__link', 'id_medicamento__id_vademecum').distinct()  
+    #				marcas = Medicamento.objects.filter(nombre_medicamento__startswith=letra).order_by('nombre_medicamento')
+            else:
+                marcas=MedicamentoPresentacion.objects.filter( pais__in=pais_otros).order_by('id_medicamento__nombre_medicamento').values('id_medicamento__nombre_medicamento', 'pais__pais_nombre', 'pais', 'pais__flag', 'pais__link', 'id_medicamento__id_vademecum').distinct()
+
+        print "antesss", marcas
+        return HttpResponse(json.JSONEncoder().encode({'data': list(marcas)}), mimetype="application/json")
+#        return HttpResponse(serializers.serialize('json', marcas, ensure_ascii=False), mimetype="application/json")
+    else:
+        raise Http404
+		
+@ensure_csrf_cookie
+def marcas(request, nombre=None, letra=None):
+    print nombre
+    top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    top20marcas_aux=[]
+    for i in top20marcas:
+        top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+    return render_to_response('marcas.html',{"pais":nombre, "letra":letra, "letters":string.uppercase, "top20marcas":top20marcas}, context_instance=RequestContext(request))
+
+def ajax_marcas(request):
+	if request.is_ajax():
+		marcas = []
+		ranking = request.POST.get("ranking", None)
+		if ranking:
+			marcas_rank = RankingMarca.objects.all().order_by('-total')
+			for marca in marcas_rank:
+				marcas.append( marca.marca )
+		else:
+			letra = request.POST.get("letra", None)
+			if letra:
+				marcas = Medicamento.objects.filter(nombre_medicamento__startswith=letra).order_by('nombre_medicamento')
+			else:
+				marcas = Medicamento.objects.filter().order_by('nombre_medicamento')
+
+		return HttpResponse(serializers.serialize('json', marcas, ensure_ascii=False), mimetype="application/json")
+	else:
+		raise Http404
+
+@ensure_csrf_cookie
+def medicamentos(request, nombre=None, letra=None):
+    top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    top20marcas_aux=[]
+    for i in top20marcas:
+        top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+    return render_to_response('medicamentos.html', {"pais":nombre, "letra":letra, "letters":string.uppercase,"top20marcas":top20marcas}, context_instance=RequestContext(request))
+
+@ensure_csrf_cookie
+def meds_sin_recipe(request, letra=None):
+    	top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    	top20marcas_aux=[]
+    	for i in top20marcas:
+        	top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    	top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+	return render_to_response('meds_sin_recipe.html', {"letra":letra, "letters":string.uppercase,"top20marcas":top20marcas}, context_instance=RequestContext(request))
+
+
+def ajax_medicamentos(request, nombre=None):
+
+
+
+	if request.is_ajax():
+		medicamento = []
+		ranking = request.POST.get("ranking", None)
+		sin_receta = request.POST.get("sin_receta", None)
+
+		if ranking:
+			meds_rank = RankingMedicamento.objects.all().order_by('-total')
+			for med in meds_rank:
+				medicamento.append( med.medicamento )
+		elif sin_receta:
+			letra = request.POST.get("letra", None)
+			if letra:
+				medicamento = MedicamentoPresentacion.objects.filter(requiere_recipe=0, nombre_presentacion__startswith=letra).order_by('nombre_presentacion')
+			else:
+				if nombre:
+					pais=Pais.objects.get(pais_nombre="PANAMA")
+					
+				    	medicamento = MedicamentoPresentacion.objects.filter(requiere_recipe=0, pais=pais).order_by('nombre_presentacion')[:220]
+				else:
+				    	pais=Pais.objects.get(pais_id=3)
+					medicamento = MedicamentoPresentacion.objects.filter(requiere_recipe=0, pais=pais).order_by('nombre_presentacion')[:220]
+		else:
+			letra = request.POST.get("letra", None)
+			if letra:
+				medicamento = MedicamentoPresentacion.objects.filter(nombre_presentacion__startswith=letra).order_by('nombre_presentacion')
+			else:
+				# Aca deberia traer TODAS pero por eficiencia me traigo unas pocas mientras tanto
+				# OJO solucionar!
+			    	if nombre:
+				    	pais=Pais.objects.get(pais_nombre="PANAMA")
+				    	medicamento = MedicamentoPresentacion.objects.filter(pais=pais).order_by('nombre_presentacion')[:900]
+				else:
+				    	pais=Pais.objects.get(pais_id=3)
+				    	medicamento = MedicamentoPresentacion.objects.filter(pais=pais).order_by('nombre_presentacion')[:900]
+
+		return HttpResponse(serializers.serialize('json', medicamento, ensure_ascii=False), mimetype="application/json")
+	else:
+		raise Http404
+
+
+@ensure_csrf_cookie
+def principios(request, nombre=None, letra=None):
+    	top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    	top20marcas_aux=[]
+    	for i in top20marcas:
+        	top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    	top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+	return render_to_response('principios.html', {"pais":nombre, "letra":letra, "letters":string.uppercase,"top20marcas":top20marcas}, context_instance=RequestContext(request))
+
+def ajax_principios(request, nombre=None):
+	
+	if request.is_ajax():
+		principio_grupo = []
+		ranking = request.POST.get("ranking", None)
+		if ranking:
+			principio_rank = RankingPrincipioActivo.objects.all().order_by('-total')
+			for principio in principio_rank:
+				principio_grupo.append( principio.principio )
+		else:
+			letra = request.POST.get("letra", None)
+			if letra: 
+				principio_grupo = PrincipioGrupo.objects.filter(prigrup_nombre__startswith=letra, idioma=2).order_by('prigrup_nombre')
+			else:
+				principio_grupo = PrincipioGrupo.objects.filter(idioma=2).order_by('prigrup_nombre')
+
+		return HttpResponse(serializers.serialize('json', principio_grupo, ensure_ascii=False), mimetype="application/json")
+	else:
+		raise Http404
+
+@ensure_csrf_cookie
+def clases(request, nombre=None):
+    	top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    	top20marcas_aux=[]
+    	for i in top20marcas:
+        	top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    	top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+	return render_to_response('clases.html', {"pais": nombre, "top20marcas":top20marcas}, context_instance=RequestContext(request))
+
+def ajax_clases(request):
+	
+	if request.is_ajax():
+		clases = []
+		ranking = request.POST.get("ranking", None)
+		if ranking:
+			clases_rank = RankingClase.objects.all().order_by('-total')
+			for clase in clases_rank:
+				clases.append( clase.clase )
+		else:
+			clases = ClaseTerapeutica.objects.filter().order_by('nombre_clase')	
+
+		return HttpResponse(serializers.serialize('json', clases, ensure_ascii=False), mimetype="application/json")
+	else:
+		raise Http404
+
+def ajax_subclases(request, nombre=None):
+	
+	if request.is_ajax():
+		subclases = []
+		ranking = request.POST.get("ranking", None)
+		if ranking:
+			subclases_rank = RankingSubclase.objects.all().order_by('-total')[:100]
+			for subclase in subclases_rank:
+				if subclase.subclase:
+					subclases.append( subclase.subclase )
+
+		return HttpResponse(serializers.serialize('json', subclases, ensure_ascii=False), mimetype="application/json")
+	else:
+		raise Http404
+
+@ensure_csrf_cookie
+def enfermedades(request, nombre=None,  letra=None):
+    	top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    	top20marcas_aux=[]
+    	for i in top20marcas:
+        	top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    	top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+	return render_to_response('enfermedades.html', {"pais":nombre, "letra":letra, "letters":string.uppercase, "top20marcas":top20marcas},context_instance=RequestContext(request))
+
+def ajax_enfermedades(request):
+
+	if request.is_ajax():
+		enfermedades = []
+		ranking = request.POST.get("ranking", None)
+		if ranking:
+			enfs_rank = RankingEnfermedad.objects.all().order_by('-total')
+			for enf in enfs_rank:
+				enfermedades.append( enf.enfermedad )
+		else:
+			letra = request.POST.get("letra", None)
+			if letra:
+				enfermedades = TipoDiagnostico.objects.filter(nombre_diagnostico__startswith=letra).order_by('nombre_diagnostico')
+			else:
+				enfermedades = TipoDiagnostico.objects.filter().order_by('nombre_diagnostico')
+
+		return HttpResponse(serializers.serialize('json', enfermedades, ensure_ascii=False), mimetype="application/json")
+	else:
+		raise Http404
+	
+def ajax_clinicas(request):
+
+	if request.is_ajax():
+		clinicas = []
+		letra = request.POST.get("letra", None)
+		if letra:
+			clinicas = Clinica.objects.filter(nombre_clinica__startswith=letra).order_by('nombre_clinica')
+		else:
+			clinicas = Clinica.objects.filter().order_by('nombre_clinica')
+
+		return HttpResponse(serializers.serialize('json', clinicas, ensure_ascii=False), mimetype="application/json")
+	else:
+		raise Http404
+
+# RANKING
+@ensure_csrf_cookie
+def ranking_marcas(request, nombre=None):
+    print "gfdgfg"
+    top20marcas = RankingMarca.objects.all().order_by('-total')[:20]
+    return render_to_response('ranking_marcas.html', {"pais":nombre, "top20marcas":top20marcas}, context_instance=RequestContext(request))
+	
+@ensure_csrf_cookie
+def ranking_medicamentos(request, nombre=None):
+	top20marcas = RankingMarca.objects.all().order_by('-total')[:20]
+	return render_to_response('ranking_medicamentos.html', {"pais":nombre, "top20marcas":top20marcas}, context_instance=RequestContext(request))
+
+@ensure_csrf_cookie
+def ranking_principios(request, nombre=None):
+	top20marcas = RankingMarca.objects.all().order_by('-total')[:20]
+	return render_to_response('ranking_principios.html', {"pais":nombre, "top20marcas":top20marcas}, context_instance=RequestContext(request))
+
+@ensure_csrf_cookie
+def ranking_clases(request, nombre=None):
+	top20marcas = RankingMarca.objects.all().order_by('-total')[:20]
+	return render_to_response('ranking_clases.html', {"pais":nombre, "top20marcas":top20marcas}, context_instance=RequestContext(request))
+
+@ensure_csrf_cookie
+def ranking_subclases(request, nombre=None):
+	top20marcas = RankingMarca.objects.all().order_by('-total')[:20]
+	return render_to_response('ranking_subclases.html', {"pais":nombre,"top20marcas":top20marcas}, context_instance=RequestContext(request))
+
+@ensure_csrf_cookie
+def ranking_enfermedades(request, nombre=None):
+	top20marcas = RankingMarca.objects.all().order_by('-total')[:20]
+	return render_to_response('ranking_enfermedades.html', {"pais":nombre, "top20marcas":top20marcas}, context_instance=RequestContext(request))
+
+# VER / DETALLE
+def ver_marca_id(request,  id, nombre=None):
+	marca = get_object_or_404(Medicamento, id_medicamento=id)
+	datos = ver_marca(request, marca, nombre)
+	return render_to_response('ver_marca.html', datos, context_instance=RequestContext(request))
+
+def ver_marca_vademecum(request, id_vademecum, nombre=None):
+    marca = get_object_or_404(Medicamento, id_vademecum=id_vademecum.encode('utf-8'))
+    datos = ver_marca(request, marca, nombre)
+    return render_to_response('ver_marca.html', datos, context_instance=RequestContext(request))
+
+def ver_marca(request, marca, nombre=None):
+    
+    pais_filter=Pais.objects.get(pais_id=3)
+        
+    pais_otros=Pais.objects.filter(pais_id__in=[1,2])
+    marca_pais=MedicamentoPresentacion.objects.filter(id_medicamento=marca, pais__in=pais_otros).values('id_medicamento__nombre_medicamento', 'pais__pais_nombre', 'pais').distinct()  
+    print marca_pais
+    meds_filter = MedicamentoPresentacion.objects.filter(id_medicamento=marca, pais=pais_filter)	
+    meds = MedicamentoPresentacion.objects.filter(id_medicamento=marca)	
+    principios = meds_filter.values('id_principio').distinct()
+	
+	#print marca.indicaciones, type(marca.indicaciones)
+	
+	# Listas que se pasan al template
+    marcas, presentaciones = [], []
+
+    for prin in principios:
+
+        id_principio = prin['id_principio']
+        meds_principio = MedicamentoPresentacion.objects.filter(~Q(id_medicamento=marca) & Q(id_principio__id_principio=id_principio) & Q(pais=pais_filter) ).values('id_medicamento').distinct()
+        for med in meds_principio:
+            marca_asoc = Medicamento.objects.get(id_medicamento=med['id_medicamento'])
+            marcas.append(marca_asoc)
+            if len(marcas) == 10:
+                break
+        if len(marcas) == 10:
+            break	
+
+    top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    top20marcas_aux=[]
+    for i in top20marcas:
+        top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+
+    principio = None
+    if meds_filter:
+        principio = meds[0].id_principio.pri_grupo
+
+    #	datos = dict(marca = marca, presentaciones = meds, marcas = marcas, principio=principio, top20marcas = top20marcas, pais=nombre)
+    datos = dict(marca = marca, presentaciones = meds_filter, marcas = marcas, principio=principio, top20marcas = top20marcas, pais=nombre, marca_pais=marca_pais)
+
+    return datos
+
+def ver_medicamento_id(request, id, nombre=None):
+	medicamento = get_object_or_404(MedicamentoPresentacion, id_presentacion=id)
+	datos = ver_medicamento(request, medicamento, nombre)
+	return render_to_response('ver_medicamento.html', datos, context_instance=RequestContext(request))
+
+def ver_medicamento_vademecum(request, id_vademecum, nombre=None):
+	medicamento = get_object_or_404(MedicamentoPresentacion, id_vademecum=id_vademecum.encode('utf-8'))
+	datos = ver_medicamento(request, medicamento, nombre)
+	return render_to_response('ver_medicamento.html', datos, context_instance=RequestContext(request))	
+
+def ver_medicamento(request, medicamento, nombre):
+
+	pagina = request.GET.get("page", 1)
+	meds_rel = MedicamentoPresentacion.objects.filter(id_principio=medicamento.id_principio).exclude(id_presentacion=medicamento.id_presentacion)[:10]
+	enfermedades = []
+
+	# tiene el mismo mini-bug que la consulta hecha en principios activos.
+	relpats = AuditRelpatologia.objects.values('arlp_idpatologia').filter(arlp_idmedicamento__amed_presentacion=medicamento).exclude(arlp_idpatologia=None).annotate(cantidad=Count('arlp_idpatologia')).order_by('-cantidad')[:10]
+
+	for relpat in relpats:
+		enfermedades.append( TipoDiagnostico.objects.get(id_diagnostico=relpat["arlp_idpatologia"]) )
+
+    	top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    	top20marcas_aux=[]
+    	for i in top20marcas:
+        	top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    	top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+
+	datos = dict(medicamento=medicamento,
+				 meds_relacionados=meds_rel,
+				 enfermedades=enfermedades,
+				 pagina=pagina, top20marcas = top20marcas,
+                pais=nombre)
+
+	return datos
+
+def ver_principio_id(request, id, nombre=None):
+	principio_grupo = get_object_or_404(PrincipioGrupo, prigrup_id=id)
+	datos = ver_principio(request, principio_grupo, nombre)
+	return render_to_response('ver_principio.html', datos, context_instance=RequestContext(request))
+
+def ver_principio_vademecum(request, id_vademecum, nombre=None):
+	principio_grupo = get_object_or_404(PrincipioGrupo, id_vademecum=id_vademecum.encode('utf-8'))
+	datos = ver_principio(request, principio_grupo, nombre)
+	return render_to_response('ver_principio.html', datos, context_instance=RequestContext(request))	
+
+def ver_principio(request, principio_grupo, nombre):
+    	print principio_grupo
+	meds = MedicamentoPresentacion.objects.filter(id_principio__pri_grupo=principio_grupo)
+
+	# Listas que se pasan al template
+	marcas, enfermedades, principios_rel, subclases = [], [], [], []
+
+	for med in meds:
+		#print "el med",med.id_presentacion
+		if med.id_medicamento not in marcas:
+			marcas.append( med.id_medicamento )
+
+		if len(marcas) == 3:
+			break
+
+	# Mejorar query!
+	# el de php parace que daba un resultado mas cercano a la realidad
+	relpats = AuditRelpatologia.objects.values('arlp_idpatologia').filter(arlp_idmedicamento__amed_presentacion__in=meds).exclude(arlp_idpatologia=None).annotate(cantidad=Count('arlp_idpatologia')).order_by('-cantidad')[:3]
+
+	for relpat in relpats:
+		enfermedades.append( TipoDiagnostico.objects.get(id_diagnostico=relpat["arlp_idpatologia"]) )
+
+
+	principio_subclase = PrincipioSubclase.objects.filter(id_principio__pri_grupo=principio_grupo)
+
+	subclases2 = []
+
+	for ps in principio_subclase:
+		subclases.append( ps.id_subclase3 )
+		subclases2.append( ps.id_subclase3.id_subclase2 )
+
+	principios = PrincipioSubclase.objects.filter(id_subclase3__id_subclase2__in=subclases2, prisub_prio=1).exclude(id_principio__pri_grupo=principio_grupo)[:3]
+
+	for principio in principios:
+		principios_rel.append(principio.id_principio.pri_grupo)	
+
+    	top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    	top20marcas_aux=[]
+    	for i in top20marcas:
+        	top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    	top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+	ListaPrincipios = PrincipioActivo.objects.filter(pri_grupo=principio_grupo.prigrup_id)
+	medicamentoPrincipio = MedicamentoPresentacion.objects.filter(id_principio__in=ListaPrincipios, tipo_medicamento='GENERICO').exclude(indicaciones=None)
+	
+	medicamento = None
+	if medicamentoPrincipio:
+		medicamento = medicamentoPrincipio[0]	
+
+	datos = dict(principio=principio_grupo,
+			     marcas=marcas,
+			     subclases=subclases2,
+			     enfermedades=enfermedades,
+			     principios=principios_rel, 
+				 top20marcas=top20marcas, 
+				 medicamento=medicamento, 
+                 pais=nombre)
+
+	return datos
+
+def ver_enfermedad_id(request, id, nombre=None):
+	enfermedad = get_object_or_404(TipoDiagnostico, id_diagnostico=id)
+	datos = ver_enfermedad(request, enfermedad, nombre)
+	return render_to_response('ver_enfermedad.html', datos, context_instance=RequestContext(request))
+
+def ver_enfermedad_vademecum(request, id_vademecum, nombre=None):
+	enfermedad = get_object_or_404(TipoDiagnostico, id_vademecum=id_vademecum.encode('utf-8'))
+	datos = ver_enfermedad(request, enfermedad, nombre)
+	return render_to_response('ver_enfermedad.html', datos, context_instance=RequestContext(request))
+
+def ver_enfermedad(request, enfermedad, nombre):
+    	if nombre=="panama":
+        	pais_filter=Pais.objects.get(pais_nombre="PANAMA")
+    	else:
+        	pais_filter=Pais.objects.get(pais_id=3)
+
+	pagina = request.GET.get("page", 1)
+
+	sintomas = SintomaEnfermedad.objects.filter(id_enfermedad=enfermedad)	
+	causas = CausaEnfermedad.objects.filter(enfermedad=enfermedad)
+	
+	# Enfermedades Relacionadas
+	diagnosticos2 = TipoDiagnosticorelacion.objects.filter(id_diagnostico=enfermedad).values('id_diagnostico2')
+
+	enfermedad_rel = TipoDiagnosticorelacion.objects.filter(~Q(id_diagnostico=enfermedad) & Q(id_diagnostico2__id__in=diagnosticos2))
+	
+	rel_patologia = AuditRelpatologia.objects.values('arlp_idpatologia').filter( Q(arlp_idpatologia__in = [x.id_diagnostico for x in enfermedad_rel] ) ).annotate(cantidad=Count('arlp_idpatologia')).order_by('-cantidad')[:3]
+
+	enfermedades_rel = TipoDiagnostico.objects.filter(id_diagnostico__in = [e["arlp_idpatologia"] for e in rel_patologia])
+
+	# Marcas Relacionadas
+	marcas_id = AuditRelpatologia.objects.values('arlp_idmedicamento__amed_presentacion__id_medicamento').filter( arlp_idpatologia = enfermedad ).annotate(cantidad=Count('arlp_idmedicamento__amed_presentacion__id_medicamento')).order_by('-cantidad')
+	marcas_rel = Medicamento.objects.filter(id_medicamento__in = [ marca["arlp_idmedicamento__amed_presentacion__id_medicamento"] for marca in marcas_id[:3] ])
+	
+	# Principios Relacionados
+	principios_id = AuditRelpatologia.objects.values('arlp_idmedicamento__amed_presentacion__id_principio').filter( arlp_idpatologia = enfermedad ).annotate(cantidad=Count('arlp_idmedicamento__amed_presentacion__id_medicamento')).order_by('-cantidad')
+	principios_rel = PrincipioActivo.objects.filter(id_principio__in = [ principio["arlp_idmedicamento__amed_presentacion__id_principio"] for principio in principios_id[:3] ])
+
+    	top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    	top20marcas_aux=[]
+    	for i in top20marcas:
+        	top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    	top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+	
+	# Presentaciones Relacionadas
+	audmeds_id = AuditRelpatologia.objects.values('arlp_idmedicamento').filter( arlp_idpatologia = enfermedad ).annotate(cantidad=Count('arlp_idmedicamento')).order_by('-cantidad')
+	marcas_presentacion = AuditMedicamento.objects.values('amed_presentacion').filter(amed_id__in = [e["arlp_idmedicamento"] for e in audmeds_id]).annotate(cantidad=Count('amed_presentacion')).order_by('-cantidad')
+
+	presentacion_rel = MedicamentoPresentacion.objects.filter(pais=pais_filter, id_presentacion__in = [ e["amed_presentacion"] for e in marcas_presentacion[:3] ])
+
+	datos = dict(	enfermedad = enfermedad,
+					sintomas = sintomas,
+					causas = causas,
+					enfermedades_rel = enfermedades_rel,
+					marcas_rel =  marcas_rel,
+					principios_rel = principios_rel,
+					presentacion_rel = presentacion_rel,
+					top20marcas = top20marcas,
+					pagina = pagina,
+                    pais=nombre)
+
+	return datos
+
+def ajax_laboratorios(request):
+	if request.is_ajax():
+		id_lab = request.POST.get("id_lab", None)
+		meds = MedicamentoPresentacion.objects.filter(id_laboratorio=id_lab).order_by('nombre_presentacion')
+
+		return HttpResponse(serializers.serialize('json', meds, ensure_ascii=False), mimetype="application/json")
+	else:
+		raise Http404
+
+@ensure_csrf_cookie
+def ver_laboratorio(request, id_vademecum, nombre=None):
+
+	lab = get_object_or_404(Laboratorio, id_vademecum=id_vademecum)
+    	top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    	top20marcas_aux=[]
+    	for i in top20marcas:
+        	top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    	top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+	return render_to_response('ver_laboratorio.html', {"pais":nombre, "lab":lab, "top20marcas":top20marcas }, context_instance=RequestContext(request))
+
+def ver_clase(request, id_vademecum, nombre=None):
+
+	clase = get_object_or_404(ClaseTerapeutica, id_vademecum=id_vademecum.encode('utf-8'))
+
+	subclases = SubclaseNivel3.objects.filter(id_subclase3__startswith=clase.id_clase)
+
+	lista_sc2 = [s.id_subclase2.sc2_id for s in subclases]
+	
+	subclases2 = SubclaseNivel2.objects.filter(sc2_id__in=lista_sc2)
+
+	principio_subclase = PrincipioSubclase.objects.filter(id_subclase3__in=subclases)
+
+	principios_activos, principios = [], []
+	for ps in principio_subclase:
+		principios.append( ps.id_principio.pri_grupo )
+		principios_activos.append( ps.id_principio )		
+		
+	meds = MedicamentoPresentacion.objects.filter(id_principio__in=principios_activos)
+	marcas = []
+	for med in meds:
+		if med.id_medicamento not in marcas:
+			marcas.append( med.id_medicamento )
+
+		if len(marcas) == 3:
+			break
+	
+    	top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    	top20marcas_aux=[]
+    	for i in top20marcas:
+        	top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    	top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+	datos = dict(clase=clase, subclases=subclases2[:3], marcas=marcas, principios=principios[:3], top20marcas = top20marcas, pais= nombre)
+
+	return render_to_response('ver_clase.html', datos, context_instance=RequestContext(request))
+
+def ver_subclase_id(request, id, nombre=None):
+
+	subclase = get_object_or_404(SubclaseNivel2, sc2_id=id)
+	datos = ver_subclase(request, subclase, nombre)
+	return render_to_response('ver_subclase.html', datos, context_instance=RequestContext(request))
+
+def ver_subclase_vademecum(request, id_vademecum, nombre=None):
+
+	subclases = SubclaseNivel2.objects.filter(id_vademecum=id_vademecum.encode('utf-8'))
+	if subclases:
+		subclase = subclases[0]
+	else:
+		raise Http404
+	datos = ver_subclase(request, subclase, nombre)
+	return render_to_response('ver_subclase.html', datos, context_instance=RequestContext(request))
+
+def ver_subclase(request, subclase, nombre):
+
+	subclases_rel = SubclaseNivel2.objects.filter(id_subclase2=subclase.id_subclase2).exclude(sc2_id=subclase.sc2_id)[:3]
+	subclase3= SubclaseNivel3.objects.filter(id_subclase2=subclase.sc2_id) 
+	principios_sub = PrincipioSubclase.objects.filter(id_subclase3__in=subclase3) 
+
+
+	principios, principios_a = [], []
+	for prin in principios_sub:
+		if prin.id_principio.pri_grupo not in principios:
+			principios.append( prin.id_principio.pri_grupo )
+
+		if prin.id_principio not in principios_a:
+			principios_a.append( prin.id_principio )
+
+
+	meds = MedicamentoPresentacion.objects.filter(id_principio__in=principios_a)
+
+	marcas = []
+	for med in meds:
+		if med.id_medicamento not in marcas:
+			marcas.append( med.id_medicamento )
+
+		if len(marcas) == 3:
+			break
+
+    	top20marcas = MedicamentoPresentacion.objects.filter(pais=Pais.objects.get(pais_id=3)).values_list('id_medicamento', flat=True).distinct()[:20]
+    	top20marcas_aux=[]
+    	for i in top20marcas:
+        	top20marcas_aux=top20marcas_aux+[int(i)]
+        
+    	top20marcas=Medicamento.objects.filter(pk__in=top20marcas_aux)
+	datos = dict(subclase=subclase, subclases_rel=subclases_rel, principios=principios[:3], marcas=marcas, top20marcas = top20marcas, pais=nombre)
+
+	return datos
+
+def error500(request):
+	if request.is_ajax():
+		return HttpResponseServerError()
+	else:
+		return render_to_response('500.html', context_instance=RequestContext(request))

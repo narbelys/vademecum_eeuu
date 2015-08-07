@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block meta_title %}
+<meta name="description" content="Medicamentos">
+<meta name="keywords" content="medicamentos que no requieren récipe médico, medicamentos que se pueden comprar sin récipe, medicamentos prescritos sin récipe médico, medicamentos que no necesitan récipe, medicamentos que se pueden comprar en la farmacia sin récipe, ley de medicamentos, venezuela, gaceta 40136, remedios sin récipe médico en venezuela, lista de medicamentos sin récipe, cuáles medicamentos requieren récipe, cuáles medicamentos se pueden comprar sin récipe.">
+
+<title>PRX Vademécum - Medicamentos Sin Recipe</title>
+{% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+
+	var directorio = []
+
+	$(document).ready(function() {
+        $(".navbar-nav li").removeClass('active');
+		$(".navbar-nav #meds_sin_recipe").addClass('active');
+
+		$('#lista').append('<img id="loader" style="display:block;margin-left:auto;margin-right:auto;" src="{{STATIC_URL}}images/loader-ajax.gif">');
+
+		$.ajax({
+			url: "/Medicamentos/getMeds",
+			data: { letra:{% if letra %}"{{letra}}"{% else %}''{% endif %}, 
+					sin_receta:1 },
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+
+			for(x in data){
+				directorio[x] = ["../Medicamentos/"+data[x].fields.id_vademecum, data[x].fields.nombre_presentacion+" ["+data[x].fields.id_laboratorio+"]"];
+			}
+				//alert(JSON.stringify(directorio));
+				return false;
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				if (errorThrown!="")	alert(errorThrown+' : '+textStatus);
+			},
+			crossDomain: false,
+			type: "POST",
+		}).done(function(){paginar(directorio);},function(){ $('#loader').remove();});
+	});
+
+</script>
+
+{% endblock %}
+
+{% block titulo %}
+  <h2><u>LISTA DE MEDICAMENTOS QUE NO REQUIEREN RECIPE MEDICO:</u></h2>
+{% endblock %}
+
+{% block contenido %}
+
+  <div class="lista">
+    <ul id="lista" class="lista-detalles">
+    </ul>
+  </div>
+
+  {% include "elements/paginacion.html" %}
+
+{% endblock %}

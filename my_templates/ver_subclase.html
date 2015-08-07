@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block meta_title %}
+<title>{{subclase.nombre_subclase3}}</title>
+
+<meta name="description" content="Descripción y todo acerca de {{subclase.nombre_subclase3}}">
+<meta name="keywords" content="subclase terapeutica {{subclase.nombre_subclase3}}, clases, marcas y principios activos relacionados">
+{% endblock %}
+
+{% block titulo %}
+  <h5>{{subclase.titulo_vademecum}}</h5>
+{% endblock %}
+
+{% block contenido %}
+
+  <h2>CLASE TERAPEUTICA: </h2>
+  <p>
+    <a href="/ClasesTerapeuticas/{{subclase.id_subclase.id_clase.id_vademecum}}">{{ subclase.id_subclase.id_clase.nombre_clase }}</a></li>
+  </p>
+
+  <h2>MARCAS: </h2>
+
+  {% if marcas %}
+    <ul class="lista-detalles">
+      {% for marca in marcas %}
+        <li><a href="/Marcas/{{marca.id_vademecum}}">{{ marca.nombre_medicamento }}</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No existen marcas relacionadas.</p>
+  {% endif %}
+
+  <h2>PRINCIPIOS ACTIVOS: </h2>
+  {% if principios %}
+    <ul class="lista-detalles">
+      {% for principio in principios %}
+        <li><a href="/PrincipiosActivos/{{principio.id_vademecum}}">{{ principio.prigrup_nombre }}</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No existen principios activos relacionados.</p>
+  {% endif %}
+
+  <h2>SUBCLASES RELACIONADAS: </h2>
+  {% if subclases_rel %}
+    <ul class="lista-detalles">
+      {% for subclase in subclases_rel %}
+        <li><a href="/SubclasesTerapeuticas/{{subclase.id_vademecum}}">{{ subclase.nombre_subclase2 }}</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No existen subclases terapéuticas relacionadas.</p>
+  {% endif %} 
+
+
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block meta_title %}
+	{% if pais %}
+		<title>{{ medicamento.nombre_presentacion }} - {{ pais.pais_nombre }}</title>
+	{% else %}
+		<title>{{ medicamento.nombre_presentacion }}</title>
+	{% endif %}
+{% endblock %}  
+
+{% block description_block %}
+	<meta name="description" content="{{ medicamento.nombre_presentacion }}">
+{% endblock %}  
+
+{% block keywords_block %}
+	{% if keywords %}
+		<meta name="keywords" content="{{keywords}}">
+	{% else %}
+		<meta name="keywords" content="{% blocktrans with brand=marca.nombre_medicamento %}
+			Medicamento, precio del {{ brand }}, cuánto cuesta {{ brand }}, para qué enfermedades se usa {{ brand }}, 
+			para cuáles enfermedades se usa {{ brand }}, medicamentos relacionados, principio  activo del {{ brand }}, dónde consigo 
+			{{ brand }}, dónde compro {{ brand }}, sustitución del {{ brand }}, prescripción del {{ brand }}, indicaciones, uso, 
+			para qué sirve {{ brand }}, que es {{ brand }}, presentaciones de {{ brand }}, medicamentos, dosis de 
+			{{ brand }}, genérico {{ brand }}, efectos secundarios {{ brand }}, 
+			comprar, contraindicaciones {{ brand }}, componentes {{ brand }}, posología, 
+			reacciones adversas, ingrediente {{ brand }}{% endblocktrans %}}">
+	{% endif %}
+{% endblock %}
+
+{% block scripts %}
+
+	<script type="text/javascript">
+
+		$(document).ready(function() {    
+			$(".navbar-nav li").removeClass('active');
+			$(".nav-tabs #medicamentos").addClass('active');
+		});
+
+	</script>
+
+{% endblock %}
+	
+{% block titulo %}
+	<div class="page-header">
+		<!--  <h1>Medicamento: {{ medicamento.nombre_presentacion }}</h1>-->
+		<h2>{{ medicamento.nombre_presentacion }}</h2>
+	</div>
+{% endblock titulo %}
+
+{% block contenido %}
+
+	{% if medicamento.id_medicamento %}
+	
+		{% if medicamento.img_presentacion %}
+			<img src="{{ STATIC_URL }}images/laboratorios/{{medicamento.img_presentacion}}" alt="{{ medicamento.nombre_presentacion }}">
+		{% endif %}
+	
+		<h2>{% trans "Marca" %}: </h2>
+		<p>
+			<a href="/Marcas/{{medicamento.id_medicamento.id_vademecum}}">{{ medicamento.id_medicamento.nombre_medicamento }}</a>
+		</p>
+	{% endif %}
+
+	{% if medicamento.id_principio %}
+		<h2>{% trans "Principio activo" %}: </h2>
+		<p>
+			<a href="/PrincipiosActivos/{{medicamento.id_principio.pri_grupo.id_vademecum}}">{{ medicamento.id_principio.pri_grupo.prigrup_nombre }}</a>
+		</p>
+	{% endif %}
+
+	{% if medicamento.id_laboratorio %}
+		<h2>{% trans "Laboratorio" %}: </h2>
+		{% if medicamento.id_laboratorio.logo %}
+			<p>
+				<a href="/Laboratorios/{{medicamento.id_laboratorio.id_vademecum}}"><img src="{{ STATIC_URL }}images/laboratorios/{{medicamento.id_laboratorio.logo }}" alt="{{ medicamento.id_laboratorio.nombre_laboratorio }}"></a>
+			</p>
+		{%else%}
+		<p>
+			<a href="/Laboratorios/{{medicamento.id_laboratorio.id_vademecum}}">{{ medicamento.id_laboratorio.nombre_laboratorio }}</a>
+		</p>
+		{% endif %}
+	{% endif %}
+
+	{% if medicamento.requiere_recipe %}
+		<h2><font color="red">{% trans "NOTA" %}:</font> {% trans "REQUIERE RECIPE MEDICO" %}</h2>			
+	{% elif medicamento.requiere_recipe == 0 %}
+		<h2><font color="red">{% trans "NOTA" %}:</font> {% trans "NO REQUIERE RECIPE MEDICO" %}</h2>
+	{% endif %}
+	
+<!--		<a href="{{ medicamento.id_vademecum }}?page=2"><button type="submit" class="btn btn-info btntoggle" id="right">Siguiente <i class="icon-white icon-arrow-right"></i></button></a>-->
+
+	{% if enfermedades %}
+		<h2>{% trans "Enfermedades" %}: </h2>
+		<ul class="lista-detalles">
+			{% for enf in enfermedades %}
+				<li><a href="/Enfermedades/{{enf.id_vademecum}}">{{ enf.nombre_diagnostico }}</a></li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+	
+	{% if meds_relacionados %}
+		<h2>{% trans "Medicamentos relacionados" %}: </h2>
+		<p>
+			<ul class="lista-detalles">
+				{% for med in meds_relacionados %}
+					<li><a href="/Medicamentos/{{med.id_vademecum}}">{{ med.nombre_presentacion }}</a></li>
+				{% endfor %}
+			</ul>
+		</p>
+	{% endif %}
+
+<!--
+
+	<a href="{{ medicamento.id_vademecum }}"><button type="submit" class="btn btn-info btntoggle"><i class="icon-white icon-arrow-left"></i> Anterior</button></a>
+-->
+
+
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block meta_title %}
+ 
+	{% if pais %}
+		<title>{% trans "Principio Activo" %} {{ principio.prigrup_nombre }} - {{pais.pais_nombre}}</title>
+	{% else %}
+		<title>{% trans "Principio Activo" %} {{ principio.prigrup_nombre }}</title>
+	{% endif %}
+
+{% endblock %}
+
+{% block description_block %}
+	<meta name="description" content="{% trans 'Descripción y todo acerca de' %} {{ principio.prigrup_nombre }}">
+{% endblock %}
+
+{% block keywords_block %}
+	{% if pais.pais_nombre %}
+		<meta name="keywords" content="marcas de {{ principio.prigrup_nombre }} en {{ pais.pais_nombre }}, medicamentos con {{ principio.prigrup_nombre }} en {{ pais.pais_nombre }}, para que sirve {{ principio.prigrup_nombre }}, marcas con {{ principio.prigrup_nombre }} medicamentos con {{ principio.prigrup_nombre }}, marcas con {{ principio.prigrup_nombre }}, qué es {{ principio.prigrup_nombre }}, cómo se usa {{ principio.prigrup_nombre }}, quién toma {{ principio.prigrup_nombre }}, dónde consigo {{ principio.prigrup_nombre }}, dónde compro {{ principio.prigrup_nombre }}, cuánto cuesta {{ principio.prigrup_nombre }}, enfermedades relacionadas con {{ principio.prigrup_nombre }}, prescripción de {{ principio.prigrup_nombre }}. Indicaciones; uso; para qué sirve; presentaciones; medicamentos, medicamentos en {{ pais.pais_nombre }}, farmacias en {{ pais.pais_nombre }}, laboratorios de {{ pais.pais_nombre }}. ">
+	{% else %}
+		<meta name="keywords" content="marcas de {{ principio.prigrup_nombre }} en {{ pais.pais_nombre }}, medicamentos con {{ principio.prigrup_nombre }} en {{ pais.pais_nombre }}, para que sirve {{ principio.prigrup_nombre }}, marcas con {{ principio.prigrup_nombre }} medicamentos con {{ principio.prigrup_nombre }}, marcas con {{ principio.prigrup_nombre }}, qué es {{ principio.prigrup_nombre }}, cómo se usa {{ principio.prigrup_nombre }}, quién toma {{ principio.prigrup_nombre }}, dónde consigo {{ principio.prigrup_nombre }}, dónde compro {{ principio.prigrup_nombre }}, cuánto cuesta {{ principio.prigrup_nombre }}, enfermedades relacionadas con {{ principio.prigrup_nombre }}, prescripción de {{ principio.prigrup_nombre }}. Indicaciones; uso; para qué sirve; presentaciones; medicamentos, farmacias, laboratorios. ">
+	{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+
+	<script type="text/javascript">
+
+		$(function() {
+			$(".navbar-nav li").removeClass('active');
+			$(".navbar-nav #principios").addClass('active');
+		});
+
+	</script>
+
+{% endblock %}
+
+{% block titulo %}
+	<div class="page-header">
+		<!--  <h1>Medicamento: {{ principio.prigrup_nombre }}</h1>-->
+		<h2>{{ principio.prigrup_nombre }}</h2>
+	</div>
+{% endblock %}
+
+{% block contenido %}
+
+	{% if medicamento.indicaciones %}
+		<h2>{% trans "Indicaciones" %}: </h2>
+		<p>{{ medicamento.indicaciones }}</p>
+	{% endif %}
+
+	{% if marcas %}
+		<h2>Marcas: </h2>
+		<p>
+			<ul class="lista-detalles">
+			{% for marca in marcas %}
+				<li><a href="/Marcas/{{marca.id_vademecum}}">{{ marca.nombre_medicamento }}</a></li>
+			{% endfor %}
+			</ul>
+		</p>
+	{% endif %}
+
+	{% if subclases %}
+		<h2>{% trans "Subclases Terapéuticas" %}: </h2>
+		<p>
+			<ul class="lista-detalles">
+			{% for subclase in subclases %}
+				<li><a href="/SubclasesTerapeuticas/{{subclase.id_vademecum}}">{{ subclase.titulo_vademecum }}</a></li>
+			{% endfor %}
+			</ul>
+		</p>
+	{% endif %} 
+
+
+	{% if enfermedades %}
+		<h2>{% trans "Enfermedades" %}: </h2>
+		<p>
+			<ul class="lista-detalles">
+			{% for enfermedad in enfermedades %}
+				<li><a href="/Enfermedades/{{enfermedad.id_vademecum}}">{{ enfermedad.nombre_diagnostico }}</a></li>
+			{% endfor %}
+			</ul>
+		</p>
+	{% endif %}
+
+	{% if principios %}
+		<h2>{% trans "Principios Activos Relacionados" %}: </h2>
+		<p>
+			<ul class="lista-detalles">
+			{% for principio in principios %}
+				<li><a href="/PrincipiosActivos/{{principio.id_vademecum}}">{{ principio.prigrup_nombre }}</a></li>
+			{% endfor %}
+			</ul>
+		</p>
+	{% endif %}
+
+
+{% endblock %}

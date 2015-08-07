@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block meta_title %}
+	<meta name="description" content="{% trans 'Medicamentos' %}">
+	{% if pais.pais_nombre %}
+		<meta name="keywords" content="contenido de la página: directorio de medicamentos, Farmacos, genéricos, remedios, vademécum; adelgazar, remedios naturales, farmacología, fármacos, tipos de remedios, tratamientos para, pastillas para bajar de peso, remedios para bajar de peso, como bajar de peso, clasificación fármacos, clasificaciones medicamentos, parafarmacia, interacciones medicamentos, guía de remedios, precios fármacos, gastos medicamentos, vademécum fármacos, salud y fármacos, medica mentos. hair removal west palm beach; florida hair removal; hair removal tallahassee; hair removal boca raton; hair removal tampa; laser hair removal in florida; kids electric toothbrushes; historical forex quotes; medicamentos en {{ pais.pais_nombre }}, farmacias en {{ pais.pais_nombre }}, laboratorios de {{ pais.pais_nombre }}. ">
+	{% else %}
+		<meta name="keywords" content="contenido de la página: directorio de medicamentos, Farmacos, genéricos, remedios, vademécum; adelgazar, remedios naturales, farmacología, fármacos, tipos de remedios, tratamientos para, pastillas para bajar de peso, remedios para bajar de peso, como bajar de peso, clasificación fármacos, clasificaciones medicamentos, parafarmacia, interacciones medicamentos, guía de remedios, precios fármacos, gastos medicamentos, vademécum fármacos, salud y fármacos, medica mentos. hair removal west palm beach; florida hair removal; hair removal tallahassee; hair removal boca raton; hair removal tampa; laser hair removal in florida; kids electric toothbrushes; historical forex quotes; medicamentos, farmacias, laboratorios. ">
+	{% endif %}
+
+	<title>PRX Vademécum - {% trans "Medicamentos" %}</title>
+{% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		$(".navbar-nav li").removeClass('active');
+		$(".navbar-nav #medicamentos").addClass('active');
+	});
+
+</script>
+
+{% endblock %}
+
+{% block titulo %}
+	<div class="page-header">
+		<h2>{% trans "MEDICAMENTOS" %}:</h2>
+	</div>
+{% endblock %}
+
+{% block contenido %}
+
+	{% if presentaciones %}
+		<div class="lista">
+			<ul id="lista" class="lista-detalles">
+			{% for presentacion in presentaciones %}
+				<li><a href="../Medicamentos/{{presentacion.id_vademecum}}">{{presentacion.nombre_presentacion}}</a></li>
+			{% endfor %}
+			</ul>
+		</div>
+	{% else %}
+		{% include "elements/no_matches_found.html" %}
+	{% endif %}
+
+	{% block paginacion_menu %}
+		{% if presentaciones %}
+			<div class="pagination">
+				<ul>
+					{% if presentaciones.has_previous %}
+						<li><a class="page_button" href="?page={{ presentaciones.previous_page_number }}">«</a></li>
+					{% else %}
+						<li class="disabled"><a class="not_clickable" href="#">«</a></li>
+					{% endif %}
+					{% for page in pags %}
+						{% if page == presentaciones.number %}
+							<li><a class="page_button" href="?page={{ presentaciones.number }}"><strong>{{ presentaciones.number }}</strong></a></li>
+						{% elif page == '...'  %}
+							<li class="disabled"><a class="not_clickable" href="#">{{ page }}</a></li>
+						{% else %}
+							<li><a class="page_button" href="?page={{ page }}">{{ page }}</a></li>
+						{% endif %}
+					{% endfor %}
+					{% if presentaciones.has_next %}<li><a class="page_button" href="?page={{ presentaciones.next_page_number }}">»</a>
+					{% else %}<li class="disabled"><a class="not_clickable" href="#">»</a>
+					{% endif %}</li>
+				</ul>
+			</div>
+			<div class="current">
+				{% trans "Página" %} {{ presentaciones.number }} {% trans "de" %} {{ presentaciones.paginator.num_pages }}.
+			</div>
+		{% endif %}
+	{% endblock %}
+
+	{% include "elements/paginacion_amplia.html" %}
+
+{% endblock %}

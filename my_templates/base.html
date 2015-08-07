@@ -1,0 +1,460 @@
+{% load i18n %}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	{% block meta_title %}
+		{% if metatag_base and metatag_base.title %}
+			<title>{{ metatag_base.title }}</title>
+		{% else %}
+			<title>PRX Vademécum</title>
+		{% endif %}
+	{% endblock %}
+
+	{% block description_block %}
+		{% if metatag_base and metatag_base.description %}
+			<meta name="description" content="{{ metatag_base.description }}">
+		{% else %}
+			<meta name="description" content="{% trans 'Directorio de medicamentos y enfermedades en español' %}">
+		{% endif %}
+	{% endblock %}
+
+	{% block keywords_block %}
+		
+		{% if metatag_base.keywords %}
+			<meta name="keywords" content="{{ metatag_base.keywords }}">  
+		{% else %}
+			{% if pais.pais_nombre %}
+				<meta name="keywords" content="{% blocktrans with country=pais.pais_nombre %}contenido de la página: medicamentos, principios activos, marcas de medicamentos, enfermedades, patologías, Centro salud, salud mental, salud mundial, salud oral, buena salud, excelente salud, promoviendo la salud, medicamentos en {{ country }}, farmacias en {{ country }}, laboratorios de {{ country }} {% endblocktrans %}.">  
+			{% else %}
+				<meta name="keywords" content="{% blocktrans %}contenido de la página: medicamentos, principios activos, marcas de medicamentos, enfermedades, patologías, Centro salud, salud mental, salud mundial, salud oral, buena salud, excelente salud, promoviendo la salud, farmacias, laboratorios{% endblocktrans %}."> 
+			{% endif %}
+		{% endif %}
+
+	{% endblock %}
+
+	<!-- BING Validate -->
+	<meta name="msvalidate.01" content="4325078B95B8081BC4C19C7D7CBC9812" />
+
+	{% if pais.iso_alpha == 'VE' %} {% include "elements/analytics/venezuela_analytics.html" %}
+	{% elif pais.iso_alpha == 'US' %} {% include "elements/analytics/eeuu_analytics.html" %}
+	{% elif pais.iso_alpha == 'PA' %} {% include "elements/analytics/panama_analytics.html" %}
+	{% elif pais.iso_alpha == 'EC' %} {% include "elements/analytics/ecuador_analytics.html" %}
+	{% elif pais.iso_alpha == 'PE' %} {% include "elements/analytics/peru_analytics.html" %}
+	{% elif pais.iso_alpha == 'CO' %} {% include "elements/analytics/colombia_analytics.html" %}
+	{% elif pais.iso_alpha == 'ES' %} {% include "elements/analytics/espania_analytics.html" %}
+	{% else %} {% include "elements/analytics/venezuela_analytics.html" %} <!-- Venezuela por defecto -->
+	{% endif %}
+
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+	<link rel="shortcut icon" href="{{ STATIC_URL }}images/favicon.ico">
+	<link href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" rel="stylesheet">
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
+	<link href="{{ STATIC_URL }}includes/pagination.css" rel="stylesheet">
+	<link href="{{ STATIC_URL }}includes/style.css" rel="stylesheet">
+
+
+	<script type="text/javascript" language="javascript" src="{{ STATIC_URL }}includes/js/jquery.js"></script>
+	<script type="text/javascript" language="javascript" src="{{ STATIC_URL }}includes/js/jquery.pagination.js"></script>
+	<script type="text/javascript" language="javascript" src="{{ STATIC_URL }}includes/js/json2.js"></script>
+	<script type="text/javascript" language="javascript" src="{{ STATIC_URL }}includes/js/directorio.js"></script>
+	<script type="text/javascript" language="javascript" src="{{ STATIC_URL }}includes/js/ajax-csrf-safe-method.js"></script>
+	{% block scripts %}
+	{% endblock %}
+
+	<script>
+		$(function(){
+		// bind change event to select
+		$('#paises').bind('change', function () {
+			var url = $(this).val(); // get selected value
+			if (url) { // require a URL
+				window.location.href = url; // redirect
+			}
+			return false;
+		});
+		});
+	</script>
+ 
+	<script>  
+			
+		window.fbAsyncInit = function(){
+			FB.Event.subscribe('comment.create', function(response){
+
+				//console.save();
+				//console.log("agregasss");
+				//console.log(response.message);
+					
+				$.ajax({
+					url: "Contacto/",
+					data: { comentario:response.message},
+					dataType: "json",
+					cache: false,
+					success: function(data) {
+						return false;
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						if (errorThrown!="")	alert(errorThrown+' : '+textStatus);
+					},
+					crossDomain: false,
+					type: "POST",
+				});
+
+				//var dummyImage = new Image;
+				//dummyImage.src = 'http://example.com/fb_email_notify.php?path='+response.href.replace('http://','');
+				//alert(response.href);
+			});
+		};
+	</script>
+
+	<div id="fb-root"></div>
+
+	<script>(function(d, s, id) {
+
+		var js, fjs = d.getElementsByTagName(s)[0];
+
+		if (d.getElementById(id)) return;
+
+		js = d.createElement(s); js.id = id;
+
+		
+
+		js.src = "//connect.facebook.net/es_LA/sdk.js#xfbml=1&appId=167881833301636&version=v2.0";
+
+		fjs.parentNode.insertBefore(js, fjs);
+
+		}(document, 'script', 'facebook-jssdk'));
+	</script>
+
+	{% if multilanguage %}
+		<script type="text/javascript">
+			function setLang(lang){
+				$('#langForm select').val(lang); 
+				$('#langForm').submit();
+				return false;
+			}
+		</script>
+	{% endif %}
+
+</head>
+
+<body>
+	{% if multilanguage %}
+		<form id="langForm" action="/i18n/setlang/" method="post">
+		{% csrf_token %}
+			<input name="next" type="hidden" value="{{ redirect_to }}" />
+			<select name="language" style="visibility: hidden">
+				{% get_language_info_list for LANGUAGES as languages %}
+				{% for language in languages %}
+					<option value="{{ language.code }}">{{ language.name_local }} ({{ language.code }})</option>
+				{% endfor %}
+			</select>
+		</form>
+	{% endif %}
+
+	{% block mapa %}
+	{% endblock %}
+
+	<div class="container contenedor">
+		<!--
+		{% ifequal pais "panama" %}
+		<div class="flag" >
+			<a href="/"> <img src="{{ STATIC_URL }}images/Flag_of_Panama.png" target="blank"> </a>
+		</div>
+		{% else %}
+		<div class="flag" >
+			<a href="/centro_america/panama">  <img src="{{ STATIC_URL }}images/Flag_of_Venezuela.png" target="blank"> </a>
+		</div>  
+		{% endifequal %}
+		--> 
+
+		<!-- AQUÍ IBA EL ANTERIOR BLOCK adsense_top -->
+
+
+		<div class="row" style="margin-left: 10px;">
+			<!--<div class="span3 well_img"><img src="{{ STATIC_URL }}images/PRX_vademecum.png" alt="PRX Vademecum logo"></div>-->
+			<div class="col-xs-3 col-sm-3 col-md-3 well_img">
+				<a href="/"><img src="{{ STATIC_URL }}images/PRX_vademecum.jpg" alt="PRX Vademecum" style="height:70px; width:auto"></a>
+			</div>
+			{% if multilanguage %}
+				<div class="col-xs-9 col-sm col-md-9 well_img">
+					<span class="pull-right">
+						<a href="#" onclick="setLang('en');">
+							<img src="{{ STATIC_URL }}images/banderas/Flag_of_EEUU.png" alt="English" title="English"/>
+						</a>
+						<a href="#" onclick="setLang('es');">
+							<img src="{{ STATIC_URL }}images/banderas/Flag_of_Spain.png" alt="Español" title="Español"/>
+						</a>
+					</span>
+				</div>
+			{% endif %}
+			<form action="/Buscar/" method="get" class="well_buscador form-search form-horizontal">
+
+				<div class="col-xs-9 col-sm-9 col-md-9">
+				
+					<div class="input-group">
+						<input type="text" class="input-xxlarge form-control" name="buscar" value="{{buscar}}">
+						<span class="input-group-btn">
+							<button class="btn btn-default buscador btn-primary" type="submit">{% trans "Buscar" %} <span class="glyphicon glyphicon glyphicon-search" aria-hidden="true"></span></button>
+						</span>
+					</div><!-- /input-group -->
+    
+					<div class="alert alert-info leyenda">
+						<h4>{% trans "Directorio de medicamentos y enfermedades." %}</h4>
+					</div>
+      
+				</div>
+			</form>
+		</div>
+		
+		
+
+    
+    
+    
+
+		<nav class="navbar navbar-default" role="navigation">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			
+	<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<ul class="nav navbar-nav">
+				<li class="menu active" id="home"><a href="/" ><span class="glyphicon glyphicon glyphicon-home" aria-hidden="true"></span> {%trans "Inicio" %}</a></li>
+				<li class="menu" id="marcas"><a href="/Marcas">{% trans "Marcas" %}</a></li>
+				<li class="menu" id="medicamentos"><a href="/Medicamentos">{% trans "Medicamentos" %}</a></li>
+				<li class="menu" id="principios"><a href="/PrincipiosActivos">{% trans "Principios Activos" %}</a></li>
+				{% if idioma.iso_alpha == "EN" %}
+				{% else %}
+					<li class="menu" id="enfermedades"><a href="/Enfermedades" >{% trans "Enfermedades" %}</a></li>
+				{% endif %}
+				{% ifequal pais.iso_alpha "VE" %}
+					<li class="menu" id="blogs"><a href="/Clinicas">Clínicas y Hospitales de Venezuela</a></li>
+				{% endifequal %}
+				<li class="menu" id="otros_paises"><a href="/Otros_paises" >{% trans "Otros países" %}</a></li>
+			</ul>
+		</div><!-- /.navbar-collapse -->
+    
+  
+		</nav>
+    
+		{% block contenido_header %}
+		{% endblock %}
+
+		{% block adsense_top %}
+			<center>
+			<!--
+				<a href="http://prxcontrolsolutions.com/contacto/" target="blank">
+					<img src="{{ STATIC_URL }}images/bannerVademecum1.gif" target="blank">
+				</a>
+			-->
+			<!-- BANNER HORIZONTAL -->
+			{% if pais.iso_alpha == 'VE' %} {% include "elements/banners/venezuela_horizontal.html" %}
+			{% elif pais.iso_alpha == 'US' %} {% include "elements/banners/eeuu_horizontal.html" %}
+			{% elif pais.iso_alpha == 'PA' %} {% include "elements/banners/panama_horizontal.html" %}
+			{% elif pais.iso_alpha == 'EC' %} {% include "elements/banners/ecuador_horizontal.html" %}
+			{% elif pais.iso_alpha == 'PE' %} {% include "elements/banners/peru_horizontal.html" %}
+			{% elif pais.iso_alpha == 'CO' %} {% include "elements/banners/colombia_horizontal.html" %}
+			{% elif pais.iso_alpha == 'ES' %} {% include "elements/banners/espania_horizontal.html" %}
+			{% else %} {% include "elements/banners/venezuela_horizontal.html" %} <!-- Venezuela por defecto -->
+			{% endif %}
+			<!-- FIN BANNER HORIZONTAL -->
+			</center>
+		{% endblock %}
+
+		<div class="row">
+			<!-- AQUÍ IBA EL ANTERIOR BLOCK contenido_header -->
+			<!--
+			<div class="well" style="border: 2px solid #3a87ad; margin-top: 0px;">
+				PRX Vademécum es un directorio gratuito que reúne información actualizada sobre medicamentos, ingredientes activos, enfermedades y mucho más. En nuestro vademécum podrá consultar indicaciones, contraindicaciones, presentaciones y reacciones adversas de los medicamentos presentes en el mercado. 
+			</div>
+			-->
+
+			<!--
+			<div class="alert alert-info">
+				PRX Vademécum es un directorio gratuito que reúne información actualizada sobre medicamentos, ingredientes activos, enfermedades y mucho más. En nuestro vademécum podrá consultar indicaciones, contraindicaciones, presentaciones y reacciones adversas de los medicamentos presentes en el mercado. 
+			</div>
+			-->
+	
+			<!-- COLUMNA 1 -->
+			<!--<div class="span3">-->
+				<!-- LOG IN
+				<form class="well form-inline">
+					<input type="text" class="input-medium" placeholder="Login">
+					<input type="password" class="input-medium" placeholder="Password">
+					<button type="submit" class="btn btn-small">Iniciar sesión <i class="icon-user"></i></button>
+					<button type="submit" class="btn btn-info btn-small">Registro</button>
+				</form>
+				-->
+				<!--{% ifequal pais "panama" %}-->
+				<!--
+				<div class="well">
+					<h2>RANKINGS: </h2>
+					<ul class="unstyled">
+					<li class="menu_ranking"><a href="/centro_america/panama/Marcas/Ranking">Marcas</a>
+					<li class="menu_ranking"><a href="/centro_america/panama/PrincipiosActivos/Ranking">Principios Activos</a>
+					<li class="menu_ranking"><a href="/centro_america/panama/Enfermedades/Ranking">Enfermedades</a>
+					</ul>class="menu" id="enfermedades"
+				</div>
+				-->
+
+				<!--{% else %}-->
+
+			
+				<!--RANKING -->
+				<!--
+				<div class="well">
+					<h2>RANKINGS: </h2>
+					<ul class="unstyled">
+						<li class="menu_ranking"><a href="/Marcas/Ranking">Marcas</a>
+						<li class="menu_ranking"><a href="/Medicamentos/Ranking">Medicamentos</a>
+						<li class="menu_ranking"><a href="/PrincipiosActivos/Ranking">Principios Activos</a>
+						<li class="menu_ranking"><a href="/Enfermedades/Ranking">Enfermedades</a>
+						<li class="menu_ranking"><a href="/ClasesTerapeuticas/Ranking">Clases Terapéuticas</a>
+						<li class="menu_ranking"><a href="/SubclasesTerapeuticas/Ranking">SubClases Terapéuticas</a>
+					</ul>
+				</div>
+				{% endifequal %}
+			</div>
+			-->
+		
+			<!-- COLUMNA 2 CONTENIDO -->
+			<div class="col-xs-12 col-sm-12 col-md-8 well_blank" >
+				{% block titulo %}{% endblock titulo %}
+				{% block adsense %}
+
+					<!-- BANNER CENTRAL -->
+					<!-- DEBEMOS PENSAR COMO ORGANIZAR LOS BANNERS SEGUN PAIS, TAL VEZ CON UNOS INCLUDE-->
+					{% if pais.iso_alpha == 'VE' %} {% include "elements/banners/venezuela_central.html" %}
+					{% elif pais.iso_alpha == 'US' %} {% include "elements/banners/eeuu_central.html" %}
+					{% elif pais.iso_alpha == 'PA' %} {% include "elements/banners/panama_central.html" %}
+					{% elif pais.iso_alpha == 'EC' %} {% include "elements/banners/ecuador_central.html" %}
+					{% elif pais.iso_alpha == 'PE' %} {% include "elements/banners/peru_central.html" %}
+					{% elif pais.iso_alpha == 'CO' %} {% include "elements/banners/colombia_central.html" %}
+					{% elif pais.iso_alpha == 'ES' %} {% include "elements/banners/espania_central.html" %}
+					{% else %} {% include "elements/banners/venezuela_central.html" %} <!-- Venezuela por defecto -->
+					{% endif %}
+					<!-- FIN BANNER CENTRAL -->
+
+				{% endblock %}
+
+				{% block contenido %}
+				{% endblock %}
+
+			</div>
+			<!-- COLUMNA 3 -->
+			<div class="col-md-4">
+				{% block derecha %}
+				
+					<!--<a href="http://prxcontrolsolutions.com/contacto/" target="blank">
+						<img src="{{ STATIC_URL }}images/bannerVademecum2.gif" target="blank">
+					</a>-->
+
+					<!-- TOP 20 MARCAS -->
+					<div class="container col-md-11 well">
+						<h2>TOP 20 {% trans "MARCAS" %}</h2>
+
+						<ol class="top20">
+						{% for marca in top20marcas %}
+							{% if marca.nombre_medicamento|length > 15 %}
+								<li><a href="/Marcas/{{marca.id_vademecum}}">{{marca.nombre_medicamento|slice:":14"}}...</a></li>
+							{% else %}
+								<li><a href="/Marcas/{{marca.id_vademecum}}">{{marca.nombre_medicamento}}</a></li>
+							{% endif %}
+						{% endfor %}
+						</ol>
+					</div>
+
+					<!-- BANNER DERECHO -->
+					{% if pais.iso_alpha == 'VE' %} {% include "elements/banners/venezuela_derecho.html" %}
+					{% elif pais.iso_alpha == 'US' %} {% include "elements/banners/eeuu_derecho.html" %}
+					{% elif pais.iso_alpha == 'PA' %} {% include "elements/banners/panama_derecho.html" %}
+					{% elif pais.iso_alpha == 'EC' %} {% include "elements/banners/ecuador_derecho.html" %}
+					{% elif pais.iso_alpha == 'PE' %} {% include "elements/banners/peru_derecho.html" %}
+					{% elif pais.iso_alpha == 'CO' %} {% include "elements/banners/colombia_derecho.html" %}
+					{% elif pais.iso_alpha == 'ES' %} {% include "elements/banners/espania_derecho.html" %}
+					{% else %} {% include "elements/banners/venezuela_derecho.html" %} <!-- Venezuela por defecto -->
+					{% endif %}
+					<!-- FIN BANNER DERECHO -->
+
+				{% endblock %}
+			</div>
+		</div>
+
+		{% block contenido_prx %}
+		{% endblock %}   
+
+		{% if idioma.iso_alpha == 'EN' %}
+		{% else %}
+			<br><br>
+			<div class="page-header">
+				<h2>Apóyate en tu comunidad para conseguir medicamentos</h2>
+			</div> 
+
+			<div class="fb-like" data-href="http://prxvademecum.com/" data-layout="standard" data-action="like" data-show-faces="true" data-share="true"></div>  
+
+			<div class="fb-comments" data-href="http://prxvademecum.com{{ request.path }}" data-width="900" data-numposts="10" data-colorscheme="light"></div>
+		{% endif %}
+	
+					
+		<center>
+				
+			<a href="http://prxcontrolsolutions.com" target="_blank">
+				<img src='{{ STATIC_URL }}images/prx_log.jpg' alt="PRX Control Solutions">
+			</a>
+			<br><br><br><br><br>
+			<!--
+			<small>
+				<br>Copyright © 2011.<br>Todos los derechos reservados.
+			</small>
+			-->
+		</center>
+					
+				
+			
+		<footer>
+
+			<div class="foot-fixed-bottom">
+			    <div class="col-xs-8 col-sm-6 col-md-6"> 
+				<p>
+					Vademécum {% trans "en otros países" %}:
+					<img src="{{ STATIC_URL }}images/banderas/{{pais.flag}}" alt="" title=""/>
+					<select style="width:200px" id="paises">
+						<!--<option value="http://prxvademecum.com" >Venezuela</option>
+						<option value="http://prxvademecum.com.pa" >Panamá</option>
+						<option value="http://prxvademecum.us" selected>EEUU</option>-->
+						<!--<option value="http://prxvademecum.com.pa" >Ecuador</option>-->
+						<!--<option value="http://prxvademecum.com.pa" >Peru</option>-->
+						{% for pais_choice in nombres_paises %}
+							{% if pais_choice.pais == pais %}
+								<option value="{{pais_choice.pais.link}}" selected>{% blocktrans with country=pais_choice.nombre %}{{ country }}{% endblocktrans %}</option>
+							{% else %}
+								<option value="{{pais_choice.pais.link}}">{% blocktrans with country=pais_choice.nombre %}{{ country }}{% endblocktrans %}</option>
+							{% endif %}
+						{% endfor %}
+					</select>
+				</p>
+				</div>
+				<div class="col-xs-4 col-sm-6 col-md-6"> 
+				<p class="pull-right">
+				    <b class="Copyright">
+					Copyright © 2011. {% trans "Todos los derechos reservados." %} &nbsp;&nbsp;&nbsp;&nbsp;
+					</b>
+					<a href="http://twitter.com/prxvademecum"><img src="{{ STATIC_URL }}images/twitter.png" title="{% trans 'Síguenos en twitter' %}" alt="{% trans 'Síguenos en twitter' %}"></a>
+					<a href="http://www.facebook.com/pages/PRX-Consulting/254676987908007"><img src="{{ STATIC_URL }}images/facebook.png" title="{% trans 'Hazte fan en facebook' %}" alt="Facebook Fanpage"></a>            
+					<a href="http://prxcontrolsolutions.com/contacto/"><img src="{{ STATIC_URL }}images/gmail.png" title="{% trans 'Envíanos un e-mail' %}" alt="{% trans 'Contacto' %}" style="width:30px; heigth:auto"></a>
+					&nbsp;&nbsp;&nbsp;&nbsp;
+				</p>
+				</div>
+			</div>
+
+		</footer>
+	</div>
+       
+</body>
+</html>

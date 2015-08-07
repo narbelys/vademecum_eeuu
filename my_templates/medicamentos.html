@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block meta_title %}
+	<meta name="description" content="Medicamentos">
+	{% if pais.pais_nombre %}
+		<meta name="keywords" content="contenido de la página: directorio de medicamentos, Farmacos, genéricos, remedios, vademécum; adelgazar, remedios naturales, farmacología, fármacos, tipos de remedios, tratamientos para, pastillas para bajar de peso, remedios para bajar de peso, como bajar de peso, clasificación fármacos, clasificaciones medicamentos, parafarmacia, interacciones medicamentos, guía de remedios, precios fármacos, gastos medicamentos, vademécum fármacos, salud y fármacos, medica mentos. hair removal west palm beach; florida hair removal; hair removal tallahassee; hair removal boca raton; hair removal tampa; laser hair removal in florida; kids electric toothbrushes; historical forex quotes; medicamentos en {{ pais.pais_nombre }}, farmacias en {{ pais.pais_nombre }}, laboratorios de {{ pais.pais_nombre }}. ">
+	{% else %}
+		<meta name="keywords" content="contenido de la página: directorio de medicamentos, Farmacos, genéricos, remedios, vademécum; adelgazar, remedios naturales, farmacología, fármacos, tipos de remedios, tratamientos para, pastillas para bajar de peso, remedios para bajar de peso, como bajar de peso, clasificación fármacos, clasificaciones medicamentos, parafarmacia, interacciones medicamentos, guía de remedios, precios fármacos, gastos medicamentos, vademécum fármacos, salud y fármacos, medica mentos. hair removal west palm beach; florida hair removal; hair removal tallahassee; hair removal boca raton; hair removal tampa; laser hair removal in florida; kids electric toothbrushes; historical forex quotes; medicamentos, farmacias, laboratorios. ">
+	{% endif %}
+
+	<title>PRX Vademécum - Medicamentos</title>
+{% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+
+	var directorio = []
+
+	$(document).ready(function() {
+        $(".navbar-nav li").removeClass('active');
+		$(".navbar-nav #medicamentos").addClass('active');
+
+		$('#lista').append('<img id="loader" style="display:block;margin-left:auto;margin-right:auto;" src="{{STATIC_URL}}images/loader-ajax.gif">');
+
+		$.ajax({
+			url: {% ifequal pais.iso_alpha 'PA' %}"/centro_america/panama/Medicamentos/getMeds"{% else %}"/Medicamentos/getMeds"{% endifequal %},
+			data: { letra:{% if letra %}"{{letra}}"{% else %}''{% endif %} },
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+
+			for(x in data){
+				directorio[x] = [data[x].fields.id_vademecum, data[x].fields.nombre_presentacion];
+			}
+				//alert(JSON.stringify(directorio));
+				return false;
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				if (errorThrown!="") alert(errorThrown+' : '+textStatus);
+			},
+			crossDomain: false,
+			type: "POST",
+		}).done(function(){paginar(directorio);},function(){ $('#loader').remove();});
+	});
+
+</script>
+
+{% endblock %}
+
+{% block titulo %}
+	<div class="page-header">
+		<h2>MEDICAMENTOS:</h2>
+	</div>
+{% endblock %}
+
+{% block contenido %}
+
+	<div class="lista">
+		<ul id="lista" class="lista-detalles">
+		</ul>
+	</div>
+
+	{% include "elements/paginacion.html" %}
+
+{% endblock %}

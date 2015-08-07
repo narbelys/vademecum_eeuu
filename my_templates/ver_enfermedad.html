@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block meta_title %}
+	{% if pais %}
+		<title>{% trans "Enfermedad" %} {{ enfermedad.nombre_diagnostico }} - {{pais.pais_nombre}}</title>
+	{% else %}
+		<title>{% trans "Enfermedad" %} {{ enfermedad.nombre_diagnostico }}</title>
+	{% endif %}
+
+	<meta name="description" content="{{enfermedad.descripcion}}">
+	{% if pais.pais_nombre %}
+		<meta name="keywords" content=" qué es {{ enfermedad.nombre_diagnostico }}, descripción de {{ enfermedad.nombre_diagnostico }}, definición de {{ enfermedad.nombre_diagnostico }}, síntomas de {{ enfermedad.nombre_diagnostico }}, causas de {{ enfermedad.nombre_diagnostico }}, tratamiento para {{ enfermedad.nombre_diagnostico }}, diagnóstico, enfermedades relacionadas, cómo tratar {{ enfermedad.nombre_diagnostico }}, quién sufre de {{ enfermedad.nombre_diagnostico }}, consecuencias de {{ enfermedad.nombre_diagnostico }}, cómo evitar {{ enfermedad.nombre_diagnostico }}, medicamentos para {{ enfermedad.nombre_diagnostico }}, remedios para {{ enfermedad.nombre_diagnostico }}, medicamentos en {{ pais.pais_nombre }}, farmacias en {{ pais.pais_nombre }}, laboratorios de {{ pais.pais_nombre }}, {{ enfermedad.keywords }}. ">
+	{% else %}
+		<meta name="keywords" content=" qué es {{ enfermedad.nombre_diagnostico }}, descripción de {{ enfermedad.nombre_diagnostico }}, definición de {{ enfermedad.nombre_diagnostico }}, síntomas de {{ enfermedad.nombre_diagnostico }}, causas de {{ enfermedad.nombre_diagnostico }}, tratamiento para {{ enfermedad.nombre_diagnostico }}, diagnóstico, enfermedades relacionadas, cómo tratar {{ enfermedad.nombre_diagnostico }}, quién sufre de {{ enfermedad.nombre_diagnostico }}, consecuencias de {{ enfermedad.nombre_diagnostico }}, cómo evitar {{ enfermedad.nombre_diagnostico }}, medicamentos para {{ enfermedad.nombre_diagnostico }}, remedios para {{ enfermedad.nombre_diagnostico }}, medicamentos, farmacias, laboratorios, {{ enfermedad.keywords }}. ">
+	{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+
+	<script type="text/javascript">
+
+		$(document).ready(function() { 
+			$(".navbar-nav li").removeClass('active');
+			$(".navbar-nav #enfermedades").addClass('active');
+		});
+
+	</script>
+
+{% endblock %}
+
+{% block titulo %}
+	<div class="page-header">
+		<!--  <h1>Enfermedad: {{ enfermedad.nombre_diagnostico }}</h1>-->
+		<h2>{{ enfermedad.nombre_diagnostico }}</h2>
+	</div>
+
+	{% if enfermedad.img_diagnostico %}
+		<img src="{{ STATIC_URL }}images/enfermedades/{{ enfermedad.img_diagnostico }}" alt="{{ enfermedad.nombre_diagnostico }}"></img>
+	{% endif %}
+
+{% endblock %}
+	
+{% block contenido %}
+
+	{% if enfermedad.descripcion %}
+		<h2>{% trans "Descripción" %}: </h2>
+		<p align="justify">{{enfermedad.descripcion}}</p>
+	{% endif %} 
+
+	{% if sintomas %}
+	<h2>{% trans "Síntomas" %}: </h2>
+	<p>
+		<ul class="lista-detalles">
+		{% for sintoma in sintomas %}
+			{% if sintoma.id_sintoma.enfermedad_relacionada %}		
+				<li><a href="/Enfermedades/{{sintoma.id_sintoma.enfermedad_relacionada.id_vademecum}}">{{ sintoma.id_sintoma.nombre_sintoma }}</a></li>
+			{% else %}
+				<li>{{ sintoma.id_sintoma.nombre_sintoma }}</li>
+			{% endif %}
+		{% endfor %}
+		</ul>
+	</p>
+	{% endif %}
+
+	{% if causas %}
+	<h2>{% trans "Causas" %}: </h2>
+	<p>
+		<ul class="lista-detalles">
+		{% for causa in causas %}
+			<li>{{ causa.causa.nombre_causa }}</a></li>
+		{% endfor %}
+		</ul>
+	</p>
+	{% endif %}
+<!--
+
+	<a href="{{ enfermedad.id_vademecum }}?page=2"><button type="submit" class="btn btn-info btntoggle" id="right">Siguiente <i class="icon-white icon-arrow-right"></i></button></a>
+-->
+
+	{% if marcas_rel %}
+		<h2>{% trans "Marcas" %}: </h2>
+		<p>
+		<ul class="lista-detalles">
+		{% for marca in marcas_rel %}
+			<li><a href="/Marcas/{{marca.id_vademecum}}">{{ marca.nombre_medicamento }}</a></li>
+		{% endfor %}
+		</ul>
+		</p>
+	{% endif %} 
+
+	{% if presentacion_rel %}
+		<h2>{% trans "Presentaciones" %}: </h2>
+		<p>
+		<ul class="lista-detalles">
+		{% for presentacion in presentacion_rel %}
+			<li><a href="/Medicamentos/{{presentacion.id_vademecum}}">{{ presentacion.nombre_presentacion }}</a></li>
+		{% endfor %}
+		</ul>
+		</p>
+	{% endif %}
+
+	{% if principios_rel %}
+		<h2>{% trans "Principios activos" %}: </h2>
+		<p>
+		<ul class="lista-detalles">
+		{% for principio in principios_rel  %}
+			<li><a href="/PrincipiosActivos/{{principio.pri_grupo.id_vademecum}}">{{ principio.pri_grupo.prigrup_nombre }}</a></li>			
+		{% endfor %}
+		</ul>
+		</p>
+	{% endif %}
+
+	{% if enfermedades_rel %}
+		<h2>{% trans "Enfermedades relacionadas" %}:</h2>
+		<p>
+		<ul class="lista-detalles">
+		{% for enfer_rel in enfermedades_rel %}
+			<li><a href="/Enfermedades/{{enfer_rel.id_vademecum}}">{{ enfer_rel.nombre_diagnostico }}</a></li>
+		{% endfor %}
+		</ul>
+		</p>
+	{% endif %}
+
+<!--			<a href="{{ enfermedad.id_vademecum }}"><button type="submit" class="btn btn-info btntoggle"><i class="icon-white icon-arrow-left"></i> Anterior</button></a>-->
+
+{% endblock %}

@@ -1,0 +1,351 @@
+# TRADUCCIONES DE PRX VADEMECUM AL INGLES.
+# Copyright (C) 2014 PRX CONTROL SOLUTIONS
+# This file is distributed under the same license as the PRX Vademécum.
+# Miguel Ambrosio <miguel.ambrosio@prxcontrolsolutions.com>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-02-11 17:26-0500\n"
+"PO-Revision-Date: 2015-02-11 17:27-0500\n"
+"Last-Translator: Miguel Ambrosio <miguel.ambrosio@prxcontrolsolutions.com>\n"
+"Language-Team: ENGLISH <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: my_templates/base.html:17
+msgid "Directorio de medicamentos y enfermedades en español"
+msgstr "Directory of prescription drugs."
+
+#: my_templates/base.html:27
+#, python-format
+msgid ""
+"contenido de la página: medicamentos, principios activos, marcas de "
+"medicamentos, enfermedades, patologías, Centro salud, salud mental, salud "
+"mundial, salud oral, buena salud, excelente salud, promoviendo la salud, "
+"medicamentos en %(country)s, farmacias en %(country)s, laboratorios de "
+"%(country)s "
+msgstr ""
+" free drug directory, vademecum english, medication usa, drugs usa, "
+"directory usa, drugs united states, prescriptions united states, active "
+"ingredients usa drugs in %(country)s, representatives in %(country)s, brands "
+"in %(country)s "
+
+#: my_templates/base.html:29
+msgid ""
+"contenido de la página: medicamentos, principios activos, marcas de "
+"medicamentos, enfermedades, patologías, Centro salud, salud mental, salud "
+"mundial, salud oral, buena salud, excelente salud, promoviendo la salud, "
+"farmacias, laboratorios"
+msgstr ""
+" free drug directory, vademecum english, medication usa, drugs usa, "
+"directory usa, drugs united states, prescriptions united states, active "
+"ingredients usa, representatives in usa, brands in usa"
+
+#: my_templates/base.html:196
+msgid "Buscar"
+msgstr "Search"
+
+#: my_templates/base.html:201
+msgid "Directorio de medicamentos y enfermedades."
+msgstr "Directory of prescription drugs."
+
+#: my_templates/base.html:228
+msgid "Inicio"
+msgstr "Home"
+
+#: my_templates/base.html:229 my_templates/ver_enfermedad.html:83
+msgid "Marcas"
+msgstr "Brands"
+
+#: my_templates/base.html:230 my_templates/medicamentos_paginator.html:5
+#: my_templates/medicamentos_paginator.html:12
+msgid "Medicamentos"
+msgstr "Drugs"
+
+#: my_templates/base.html:231 my_templates/principios_paginator.html:5
+#: my_templates/principios_paginator.html:13
+msgid "Principios Activos"
+msgstr "Active Ingredients"
+
+#: my_templates/base.html:234 my_templates/enfermedades_paginator.html:5
+#: my_templates/enfermedades_paginator.html:12
+#: my_templates/ver_medicamento.html:94 my_templates/ver_principio.html:78
+msgid "Enfermedades"
+msgstr "Diseases"
+
+#: my_templates/base.html:239 my_templates/ver_marca.html:105
+msgid "Otros países"
+msgstr "Drugs in other countries"
+
+#: my_templates/base.html:360 my_templates/home.html:90
+#: my_templates/marcas_paginator.html:19
+msgid "MARCAS"
+msgstr "BRANDS"
+
+#: my_templates/base.html:425
+msgid "en otros países"
+msgstr "in other countries"
+
+#: my_templates/base.html:435 my_templates/base.html.py:437
+#, python-format
+msgid "%(country)s"
+msgstr ""
+
+#: my_templates/base.html:446
+msgid "Todos los derechos reservados."
+msgstr "All rights reserved."
+
+#: my_templates/base.html:448
+msgid "Síguenos en twitter"
+msgstr "Follow us on twitter"
+
+#: my_templates/base.html:449
+msgid "Hazte fan en facebook"
+msgstr "Facebook Fanpage"
+
+#: my_templates/base.html:450
+msgid "Envíanos un e-mail"
+msgstr "Send us an e-mail"
+
+#: my_templates/base.html:450
+msgid "Contacto"
+msgstr "Contact us"
+
+#: my_templates/clinicas_paginator.html:67
+#: my_templates/enfermedades_paginator.html:74
+#: my_templates/marcas_paginator.html:62
+#: my_templates/medicamentos_paginator.html:72
+#: my_templates/otros_paises_paginator.html:76
+#: my_templates/principios_paginator.html:74
+msgid "Página"
+msgstr "Page"
+
+#: my_templates/clinicas_paginator.html:67
+#: my_templates/enfermedades_paginator.html:74
+#: my_templates/marcas_paginator.html:62
+#: my_templates/medicamentos_paginator.html:72
+#: my_templates/otros_paises_paginator.html:76
+#: my_templates/principios_paginator.html:74
+msgid "de"
+msgstr "of"
+
+#: my_templates/enfermedades_paginator.html:31 my_templates/home.html:45
+msgid "ENFERMEDADES"
+msgstr "DISEASES"
+
+#: my_templates/home.html:35 my_templates/medicamentos_paginator.html:30
+#: my_templates/ver_laboratorio.html:80
+msgid "MEDICAMENTOS"
+msgstr "DRUGS"
+
+#: my_templates/home.html:53
+msgid "Ver más"
+msgstr "Show more"
+
+#: my_templates/home.html:63
+msgid ""
+"PRX Vademécum es un directorio gratuito que reúne información actualizada "
+"sobre medicamentos, ingredientes activos, enfermedades y mucho más. En "
+"nuestro vademécum podrá consultar indicaciones, contraindicaciones, "
+"presentaciones y reacciones adversas de los medicamentos presentes en el "
+"mercado."
+msgstr ""
+"PRX Vademecum is a free directory of updated information about prescription "
+"drugs, active ingredients and much more. In our Vademecum you will be able "
+"to consult about drug's indications, brands and side effects."
+
+#: my_templates/home.html:67 my_templates/ranking_enfermedades.html:58
+#: my_templates/ranking_medicamentos.html:58
+msgid "ADVERTENCIA"
+msgstr "WARNING"
+
+#: my_templates/home.html:67
+msgid ""
+"El contenido presente en esta página es con fines informativos y la correcta "
+"interpretación requiere de formación especializada. Evite la automedicación, "
+"consulte a su médico."
+msgstr ""
+"The content of this directory is for information purposes only and the "
+"correct interpretation requires specialized training. Avoid self-medication, "
+"consult your doctor."
+
+#: my_templates/otros_paises_paginator.html:25
+msgid "MARCAS OTROS PAISES"
+msgstr "BRANDS IN OTHER COUNTRIES"
+
+#: my_templates/principios_paginator.html:31
+msgid "PRINCIPIOS ACTIVOS"
+msgstr "ACTIVE INGREDIENTS"
+
+#: my_templates/prueba.html:3 vademecum/test_view.py:27
+msgid "Bienvenido al sitio"
+msgstr "Welcome to the site"
+
+#: my_templates/ranking_enfermedades.html:8
+msgid "Ranking de Enfermedades"
+msgstr "Diseases Ranking"
+
+#: my_templates/ranking_enfermedades.html:48
+msgid "RANKING DE ENFERMEDADES"
+msgstr "DISEASES RANKING"
+
+#: my_templates/ranking_enfermedades.html:58
+#: my_templates/ranking_medicamentos.html:58
+msgid ""
+"Información referencial, obtenida de la aplicación para el análisis de "
+"siniestros farmacológicos"
+msgstr ""
+"Referencial information obtained through our pharmaceutical treatments "
+"analysis app"
+
+#: my_templates/ranking_medicamentos.html:8
+msgid "Ranking de Medicamentos"
+msgstr "Drugs Ranking"
+
+#: my_templates/ranking_medicamentos.html:48
+msgid "RANKING DE MEDICAMENTOS"
+msgstr "DRUGS RANKING"
+
+#: my_templates/ver_enfermedad.html:6 my_templates/ver_enfermedad.html.py:8
+msgid "Enfermedad"
+msgstr "Diseases"
+
+#: my_templates/ver_enfermedad.html:48
+msgid "Descripción"
+msgstr "Description"
+
+#: my_templates/ver_enfermedad.html:53
+msgid "Síntomas"
+msgstr "Symptoms"
+
+#: my_templates/ver_enfermedad.html:68
+msgid "Causas"
+msgstr "Causes"
+
+#: my_templates/ver_enfermedad.html:94 my_templates/ver_marca.html:74
+msgid "Presentaciones"
+msgstr "Preparations"
+
+#: my_templates/ver_enfermedad.html:105
+msgid "Principios activos"
+msgstr "Active Ingredients"
+
+#: my_templates/ver_enfermedad.html:116
+msgid "Enfermedades relacionadas"
+msgstr "Related Diseases"
+
+#: my_templates/ver_laboratorio.html:7 my_templates/ver_laboratorio.html:9
+#: my_templates/ver_laboratorio.html:13 my_templates/ver_medicamento.html:73
+msgid "Laboratorio"
+msgstr "Representative"
+
+#: my_templates/ver_laboratorio.html:12 my_templates/ver_marca.html:13
+#: my_templates/ver_principio.html:15
+msgid "Descripción y todo acerca de"
+msgstr "Description and all about"
+
+#: my_templates/ver_laboratorio.html:66 my_templates/ver_laboratorio.html:73
+msgid "LABORATORIO"
+msgstr "REPRESENTATIVE"
+
+#: my_templates/ver_marca.html:6 my_templates/ver_marca.html.py:8
+#: my_templates/ver_medicamento.html:59
+msgid "Marca"
+msgstr "Brand"
+
+#: my_templates/ver_marca.html:20 my_templates/ver_medicamento.html:20
+#, python-format
+msgid ""
+"\n"
+"\t\t\tMedicamento, precio del %(brand)s, cuánto cuesta %(brand)s, para qué "
+"enfermedades se usa %(brand)s, \n"
+"\t\t\tpara cuáles enfermedades se usa %(brand)s, medicamentos relacionados, "
+"principio  activo del %(brand)s, dónde consigo \n"
+"\t\t\t%(brand)s, dónde compro %(brand)s, sustitución del %(brand)s, "
+"prescripción del %(brand)s, indicaciones, uso, \n"
+"\t\t\tpara qué sirve %(brand)s, que es %(brand)s, presentaciones de "
+"%(brand)s, medicamentos, dosis de \n"
+"\t\t\t%(brand)s, genérico %(brand)s, efectos secundarios %(brand)s, \n"
+"\t\t\tcomprar, contraindicaciones %(brand)s, componentes %(brand)s, "
+"posología, \n"
+"\t\t\treacciones adversas, ingrediente %(brand)s"
+msgstr ""
+
+#: my_templates/ver_marca.html:67
+msgid "Indicaciones"
+msgstr "Indications"
+
+#: my_templates/ver_marca.html:85 my_templates/ver_medicamento.html:66
+msgid "Principio activo"
+msgstr "Active Ingredient"
+
+#: my_templates/ver_marca.html:94
+msgid "Marcas relacionadas"
+msgstr "Related Brands"
+
+#: my_templates/ver_marca.html:109
+msgid "en"
+msgstr "in"
+
+#: my_templates/ver_marca.html:117
+msgid "Contraindicaciones"
+msgstr "Interactions"
+
+#: my_templates/ver_marca.html:122
+msgid "Posología"
+msgstr "Dosage"
+
+#: my_templates/ver_marca.html:127
+msgid "Reacciones adversas"
+msgstr "Side Effects"
+
+#: my_templates/ver_medicamento.html:86 my_templates/ver_medicamento.html:88
+msgid "NOTA"
+msgstr "PD."
+
+#: my_templates/ver_medicamento.html:86
+msgid "REQUIERE RECIPE MEDICO"
+msgstr "THIS IS A PRESCRIPTION DRUG"
+
+#: my_templates/ver_medicamento.html:88
+msgid "NO REQUIERE RECIPE MEDICO"
+msgstr "THIS IS A NON-PRESCRIPTION DRUG"
+
+#: my_templates/ver_medicamento.html:103
+msgid "Medicamentos relacionados"
+msgstr "Related Drugs"
+
+#: my_templates/ver_principio.html:7 my_templates/ver_principio.html.py:9
+msgid "Principio Activo"
+msgstr "Active Ingredient"
+
+#: my_templates/ver_principio.html:66
+msgid "Subclases Terapéuticas"
+msgstr "Therapeutic Subclasses"
+
+#: my_templates/ver_principio.html:89
+msgid "Principios Activos Relacionados"
+msgstr "Related Active Ingredients"
+
+#: my_templates/elements/no_matches_found.html:3
+msgid "La búsqueda no retornó resultados."
+msgstr "No matches found."
+
+#: prx_vademecum/local_settings.py:45
+msgid "Spanish"
+msgstr ""
+
+#: prx_vademecum/local_settings.py:46
+msgid "English"
+msgstr ""
+
+# Nombres de paises que deben descomentarse
+msgid "ESTADOS UNIDOS"
+msgstr "UNITED STATES"
+
+msgid "ESPAÑA"
+msgstr "SPAIN"

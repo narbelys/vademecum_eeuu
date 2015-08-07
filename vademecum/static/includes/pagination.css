@@ -1,0 +1,41 @@
+/** PAGINATION LETTERS **/
+
+#Pagination{
+    display: inherit;
+}
+
+#pagination-letters{
+  border:0; margin:0; 
+  padding:10px 0 0 0;
+  font-size:11px;
+  list-style:none;
+height: 30px;
+
+}
+
+#pagination-letters .active{
+  font-weight:bold;
+  color:black;
+  display:block;
+  float:left;
+  padding:3px 3px;
+}
+#pagination-letters a:link,
+#pagination-letters a:visited {
+  display:block;
+  float:left;
+  padding:2px 3px;
+  text-decoration:none;
+  text-align: left;
+}
+#pagination-letters a:hover{
+  text-decoration:underline;
+}
+
+.red {
+  color: red;
+}
+
+.buscador {
+  margin-bottom: 5px;
+}

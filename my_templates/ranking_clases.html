@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block meta_title %}
+<meta name="description" content="Lista y guia de medicamentos, enfermedades, patologias, principios activos, clases terapeuticas, laboratorios.">
+<meta name="keywords" content="Ranking, medicamentos, enfermedades, principios activos, clases terapeuticas, marcas, patologias, drogas, medicina, mexico; Canada; united states; Colombia; peru; hong Kong; medicamentos en Venezuela, farmacias en Venezuela, laboratorios de Venezuela. ">
+
+<title>PRX Vademécum - Ranking de Clases Terapéuticas</title>
+{% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+
+	var directorio = []
+
+	$(document).ready(function() {
+        $(".navbar-nav li").removeClass('active');
+		$(".navbar-nav #clases").addClass('active');
+
+		$('#lista').append('<img id="loader" style="display:block;margin-left:auto;margin-right:auto;" src="{{STATIC_URL}}images/loader-ajax.gif">');
+
+		$.ajax({
+			url: "/ClasesTerapeuticas/getClases",
+			data: { ranking:1 },
+			dataType: "json",
+			success: function(data) {
+
+			for(x in data){
+				directorio[x] = [data[x].fields.id_vademecum, data[x].fields.nombre_clase];
+			}
+				//alert(JSON.stringify(directorio));
+				return false;
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				if (errorThrown!="")	alert(errorThrown+' : '+textStatus);
+			},
+			crossDomain: false,
+			type: "POST",
+		})
+		.done(function(){paginar(directorio);},function(){ $('#loader').remove();});
+	});
+
+</script>
+
+{% endblock %}
+
+{% block titulo %}
+  <h2>RANKING DE CLASES TERAPEUTICAS:</h2>
+{% endblock %}
+
+{% block contenido %}
+  <div class="lista">
+    <ol id="lista">
+    </ol>
+  </div>
+
+  <p><span class="red">ADVERTENCIA:</span> Información referencial, obtenida de la aplicación para el análisis de siniestros farmacológicos
+             <a href="http://pcaaudit.com">PCA Audit</a>.
+  </p>
+
+  {% include "elements/paginacion.html" %}
+
+{% endblock %}

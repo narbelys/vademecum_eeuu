@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block meta_title %}
+	<meta name="description" content="{% trans 'Principios Activos' %}">
+
+	{% if pais.pais_nombre %}
+		<meta name="keywords" content="principios activos de {{ pais.pais_nombre }}, ingredientes activos de {{ pais.pais_nombre }}, marcas de ingredientes activos de {{ pais.pais_nombre }}, marcas de princpios activos de {{ pais.pais_nombre }}, ingredientes activos en {{ pais.pais_nombre }}, principios activos en {{ pais.pais_nombre }}, lista de principios activos en {{ pais.pais_nombre }}, ingredientes de medicamentos, contenido de la página: directorio de principios activos, medicamentos en {{ pais.pais_nombre }}, farmacias en {{ pais.pais_nombre }}, laboratorios de {{ pais.pais_nombre }}. ">
+	{% else %}
+		<meta name="keywords" content="principios activos de {{ pais.pais_nombre }}, ingredientes activos de {{ pais.pais_nombre }}, marcas de ingredientes activos de {{ pais.pais_nombre }}, marcas de princpios activos de {{ pais.pais_nombre }}, ingredientes activos en {{ pais.pais_nombre }}, principios activos en {{ pais.pais_nombre }}, lista de principios activos en {{ pais.pais_nombre }}, ingredientes de medicamentos, contenido de la página: directorio de principios activos, medicamentos en {{ pais.pais_nombre }}, farmacias en {{ pais.pais_nombre }}, laboratorios de {{ pais.pais_nombre }}. ">
+	{% endif %}
+
+	<title>PRX Vademécum - {% trans "Principios Activos" %}</title>
+{% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+
+	$(function() {
+		$(".navbar-nav li").removeClass('active');
+		$(".navbar-nav #principios").addClass('active');
+	});
+
+</script>
+
+{% endblock %}
+
+{% block titulo %}
+ <div class="page-header">
+  <h2>{% trans "PRINCIPIOS ACTIVOS" %}:</h2>
+</div>
+{% endblock %}
+
+{% block contenido %}
+
+	
+	{% if principios %}
+		<div class="lista">
+			<ul id="lista" class="lista-detalles">
+			{% for principio in principios %}
+				<li><a href="../PrincipiosActivos/{{principio.id_vademecum}}">{{principio.prigrup_nombre}}</a></li>
+			{% endfor %}
+			</ul>
+		</div>
+	{% else %}
+		{% include "elements/no_matches_found.html" %}
+	{% endif %}
+
+	{% block paginacion_menu %}
+		{% if principios %}
+			<div class="pagination">
+				<ul>
+					{% if principios.has_previous %}
+						<li><a class="page_button" href="?page={{ principios.previous_page_number }}">«</a></li>
+					{% else %}
+						<li class="disabled"><a class="not_clickable" href="#">«</a></li>
+					{% endif %}
+					{% for page in pags %}
+						{% if page == principios.number %}
+							<li><a class="page_button" href="?page={{ principios.number }}"><strong>{{ principios.number }}</strong></a></li>
+						{% elif page == '...'  %}
+							<li class="disabled"><a class="not_clickable" href="#">{{ page }}</a></li>
+						{% else %}
+							<li><a class="page_button" href="?page={{ page }}">{{ page }}</a></li>
+						{% endif %}
+					{% endfor %}
+					{% if principios.has_next %}<li><a class="page_button" href="?page={{ principios.next_page_number }}">»</a>
+					{% else %}<li class="disabled"><a class="not_clickable" href="#">»</a>
+					{% endif %}</li>
+				</ul>
+			</div>
+			<div class="current">
+				{% trans "Página" %} {{ principios.number }} {% trans "de" %} {{ principios.paginator.num_pages }}.
+			</div>
+		{% endif %}
+	{% endblock %}
+
+	{% include "elements/paginacion_amplia.html" %}
+
+{% endblock %}

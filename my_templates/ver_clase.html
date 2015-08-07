@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block meta_title %}
+  <meta name="description" content="Descripción y todo acerca de {{clase.nombre_clase}}">
+  <meta name="keywords" content="clase terapeutica {{clase.nombre_clase}}, subclases, marcas y principios activos relacionados, mexico; Canada; united states; Colombia; peru; hong Kong; medicamentos en Venezuela, farmacias en Venezuela, laboratorios de Venezuela. ">
+ {% ifequal pais "panama" %}
+  <title>Clase {{clase.nombre_clase}} {{pais}}</title>
+   {% else %}
+   <title>Clase {{clase.nombre_clase}} Estados Unidos</title>
+   {% endifequal %}
+{% endblock %}
+
+{% block scripts %}
+
+	<script type="text/javascript">
+
+		$(document).ready(function() {    
+			$(".navbar-nav li").removeClass('active');
+			$(".navbar-nav #clases").addClass('active');
+		});
+
+	</script>
+
+{% endblock %}
+
+
+{% block titulo %}
+    <div class="page-header">
+<!--  <h1>Clases Terapéuticas: {{clase.nombre_clase}}</h1>-->
+  <h2>{{clase.nombre_clase}}</h2>
+</div>
+
+{% endblock %}
+
+{% block contenido %}
+
+  {% if subclases %}
+   <h2>Subclases Terapéuticas: </h2>
+   <p>
+    <ul class="lista-detalles">
+      {% for subclase in subclases %}
+           {% ifequal pais "panama" %}
+        <li><a href="/centro_america/panama/SubclasesTerapeuticas/{{subclase.id_vademecum}}">{{ subclase.titulo_vademecum }}</a></li>
+    {% else %}
+        <li><a href="/SubclasesTerapeuticas/{{subclase.id_vademecum}}">{{ subclase.titulo_vademecum }}</a></li>
+        {% endifequal %}
+      {% endfor %}
+    </ul>
+    </p>
+  {% endif %} 
+
+  {% if marcas %}
+	<h2>Marcas: </h2>
+   <p>
+    <ul class="lista-detalles">
+      {% for marca in marcas %}
+           {% ifequal pais "panama" %}
+        <li><a href="/centro_america/panama/Marcas/{{marca.id_vademecum}}">{{ marca.nombre_medicamento }}</a></li>
+            {% else %}
+        <li><a href="/Marcas/{{marca.id_vademecum}}">{{ marca.nombre_medicamento }}</a></li>
+            {% endifequal %}
+      {% endfor %}
+    </ul>
+    </p>
+  {% endif %}
+
+  {% if principios %}
+	<h2>Principios Activos: </h2>
+   <p>
+    <ul class="lista-detalles">
+      {% for principio in principios %}
+           {% ifequal pais "panama" %}
+        <li><a href="/centro_america/panama/PrincipiosActivos/{{principio.id_vademecum}}">{{ principio.prigrup_nombre }}</a></li>
+            {% else %}
+        <li><a href="/PrincipiosActivos/{{principio.id_vademecum}}">{{ principio.prigrup_nombre }}</a></li>
+            {% endifequal %}
+      {% endfor %}
+    </ul>
+    </p>
+  {% endif %}
+
+
+{% endblock %}

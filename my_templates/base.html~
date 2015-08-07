@@ -1,0 +1,372 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+  {% block meta_title %}
+  <title>PRX Vademécum USA – Estados Unidos</title>
+  <meta name="description" content="Directorio de medicamentos y enfermedades de Estados Unidos (USA) en español">
+  <meta name="keywords" content="contenido de la página: medicamentos, principios activos, marcas de medicamentos, enfermedades, patologías, Centro salud, salud mental, salud mundial, salud oral, buena salud, excelente salud, promoviendo la salud, mexico; Canada; united states; Colombia; peru; hong Kong; medicamentos en Venezuela, farmacias en Venezuela, laboratorios de Venezuela.">  
+  {% endblock %}
+  {% include "elements/analytics.html" %}
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+  <link rel="shortcut icon" href="{{ STATIC_URL }}images/favicon.ico">
+  <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" rel="stylesheet">
+  <link href="{{ STATIC_URL }}includes/pagination.css" rel="stylesheet">
+  <link href="{{ STATIC_URL }}includes/style.css" rel="stylesheet">
+  
+  
+  <script type="text/javascript" language="javascript" src="{{ STATIC_URL }}includes/js/jquery.js"></script>
+  <script type="text/javascript" language="javascript" src="{{ STATIC_URL }}includes/js/jquery.pagination.js"></script>
+  <script type="text/javascript" language="javascript" src="{{ STATIC_URL }}includes/js/json2.js"></script>
+  <script type="text/javascript" language="javascript" src="{{ STATIC_URL }}includes/js/directorio.js"></script>
+  <script type="text/javascript" language="javascript" src="{{ STATIC_URL }}includes/js/ajax-csrf-safe-method.js"></script>
+  {% block scripts %}
+  {% endblock %}
+</head>
+
+<body>
+
+<script>
+    $(function(){
+      // bind change event to select
+      $('#paises').bind('change', function () {
+          var url = $(this).val(); // get selected value
+          if (url) { // require a URL
+              window.location.href = url; // redirect
+          }
+          return false;
+      });
+    });
+</script>
+ 
+<script>  
+    
+window.fbAsyncInit = function(){
+FB.Event.subscribe('comment.create', function(response){
+
+    
+//    console.save()
+    console.log("agregasss")
+    console.log(response.message)
+    
+    	$.ajax({
+			url: "Contacto/",
+			data: { comentario:response.message},
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+				return false;
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				if (errorThrown!="")	alert(errorThrown+' : '+textStatus);
+			},
+			crossDomain: false,
+			type: "POST",
+		});
+
+//  var dummyImage = new Image;
+//  dummyImage.src = 'http://example.com/fb_email_notify.php?path='+response.href.replace('http://','');
+  //alert(response.href);
+  });
+ 
+};
+</script>
+
+<div id="fb-root"></div>
+
+<script>(function(d, s, id) {
+
+ var js, fjs = d.getElementsByTagName(s)[0];
+
+ if (d.getElementById(id)) return;
+
+ js = d.createElement(s); js.id = id;
+
+ 
+
+js.src = "//connect.facebook.net/es_LA/sdk.js#xfbml=1&appId=167881833301636&version=v2.0";
+
+ fjs.parentNode.insertBefore(js, fjs);
+
+}(document, 'script', 'facebook-jssdk'));</script>
+
+{% block mapa %}
+{% endblock %}
+
+<div class="container">
+<!--
+   
+    {% ifequal pais "panama" %}
+    <div class="flag" >
+        <a href="/"> <img src="{{ STATIC_URL }}images/Flag_of_Panama.png" target="blank"> </a>
+    </div>
+    {% else %}
+    <div class="flag" >
+        <a href="/centro_america/panama">  <img src="{{ STATIC_URL }}images/Flag_of_Venezuela.png" target="blank"> </a>
+    </div>  
+    {% endifequal %}
+-->
+ 
+
+  {% block adsense_top %}
+
+	<center>
+<!--
+	<a href="http://prxcontrolsolutions.com/contacto/" target="blank">
+		<img src="{{ STATIC_URL }}images/bannerVademecum1.gif" target="blank">
+	</a>
+-->
+	</center>
+
+  {% endblock %}
+
+
+  <div class="row">
+
+
+<!--    <div class="span3 well_img"><img src="{{ STATIC_URL }}images/PRX_vademecum.png" alt="PRX Vademecum logo"></div>-->
+    <div class="span3 well_img"><img src="{{ STATIC_URL }}images/PRX_vademecum.jpg" alt="PRX Vademecum logo" style="height:70px; width:auto"></div>
+     {% ifequal pais "panama" %}
+    <form action="/centro_america/panama/Buscar/" method="get" class="well_buscador form-search form-horizontal">
+     {% else %}
+    <form action="/Buscar/" method="get" class="well_buscador form-search form-horizontal">
+     {% endifequal %}
+      <div class="span8_5">
+      <input type="text" class="input-xxlarge" name="buscar" value="{{buscar}}">
+      <button type="submit" class="btn buscador btn-primary">Buscar <i class="icon-search icon-white"></i></button>
+      <div class="alert alert-info">
+        <h4>Directorio de medicamentos y enfermedades.</h4>
+    </div>
+      
+      </div>
+    </form>
+  </div>
+
+  <ul class="nav nav-tabs">
+   {% ifequal pais "panama" %}
+   <li class="menu" id="home"><a href="/centro_america/panama"><i class="icon-home"></i> Inicio</a></li>
+   {% else %}
+    <li class="menu" id="home"><a href="/"><i class="icon-home"></i> Inicio</a></li>
+    {% endifequal %}
+    {% ifequal pais "panama" %}
+    <li class="menu" id="marcas"><a href="/centro_america/panama/Marcas">Marcas</a></li>
+    {% else %}
+    <li class="menu" id="marcas"><a href="/Marcas">Marcas</a></li>
+    {% endifequal %}
+    {% ifequal pais "panama" %}
+    <li class="menu" id="medicamentos"><a href="/centro_america/panama/Medicamentos">Medicamentos</a></li>
+    {% else %}
+    <li class="menu" id="medicamentos"><a href="/Medicamentos">Medicamentos</a></li>
+    {% endifequal %}
+    {% ifequal pais "panama" %}
+    <li class="menu" id="principios"><a href="/centro_america/panama/PrincipiosActivos">Principios Activos</a></li>
+    {% else %}
+    <li class="menu" id="principios"><a href="/PrincipiosActivos">Principios Activos</a></li>
+    {% endifequal %}
+<!--
+    {% ifequal pais "panama" %}
+    <li class="menu" id="clases"><a href="/centro_america/panama/ClasesTerapeuticas">Clases Terapéuticas</a></li>
+    {% else %}
+    <li class="menu" id="clases"><a href="/ClasesTerapeuticas">Clases Terapéuticas</a></li>
+    {% endifequal %}
+-->
+    {% ifequal pais "panama" %}
+    <li class="menu" id="enfermedades"><a href="/centro_america/panama/Enfermedades">Enfermedades</a></li>
+    {% else %}
+    <li class="menu" id="enfermedades"><a href="/Enfermedades">Enfermedades</a></li>
+    {% endifequal %}
+    {% ifequal pais "panama" %}
+    {% else %}
+<!--    <li class="menu" id="blogs"><a href="/Clinicas">Clínicas y Hospitales de Venezuela</a></li>-->
+    {% endifequal %}
+       <li class="menu" id="otros_paises"><a href="/Otros_paises">Otros paises</a></li>
+<!--     <li class="menu" id="meds_sin_recipe"><a href="/MedicamentosSinRecipe">Hospitales</a></li> -->
+<!--     <li class="menu" id="blogs"><a href="/Blogs">Blogs</a></li> -->
+<!--     <li class="menu" id="meds_sin_recipe"><a href="/MedicamentosSinRecipe">Medicamentos sin Récipe Médico</a></li> -->
+  </ul>
+
+  <div class="row">
+        {% block contenido_header %}
+          {% endblock %}
+
+
+<!--
+<div class="well" style="border: 2px solid #3a87ad; margin-top: 0px;">
+ PRX Vademécum es un directorio gratuito que reúne información actualizada sobre medicamentos, ingredientes activos, enfermedades y mucho más. En nuestro vademécum podrá consultar indicaciones, contraindicaciones, presentaciones y reacciones adversas de los medicamentos presentes en el mercado. 
+</div>
+-->
+
+<!--
+<div class="alert alert-info">
+PRX Vademécum es un directorio gratuito que reúne información actualizada sobre medicamentos, ingredientes activos, enfermedades y mucho más. En nuestro vademécum podrá consultar indicaciones, contraindicaciones, presentaciones y reacciones adversas de los medicamentos presentes en el mercado. 
+</div>
+-->
+ 
+         
+
+        <!-- COLUMNA 1 -->
+<!--        <div class="span3">-->
+          <!-- LOG IN
+          <form class="well form-inline">
+            <input type="text" class="input-medium" placeholder="Login">
+            <input type="password" class="input-medium" placeholder="Password">
+            <button type="submit" class="btn btn-small">Iniciar sesión <i class="icon-user"></i></button>
+            <button type="submit" class="btn btn-info btn-small">Registro</button>
+          </form>
+          -->
+<!--              {% ifequal pais "panama" %}-->
+<!--
+              <div class="well">
+               <h1>RANKINGS: </h1>
+            <ul class="unstyled">
+            <li class="menu_ranking"><a href="/centro_america/panama/Marcas/Ranking">Marcas</a>
+            <li class="menu_ranking"><a href="/centro_america/panama/PrincipiosActivos/Ranking">Principios Activos</a>
+            <li class="menu_ranking"><a href="/centro_america/panama/Enfermedades/Ranking">Enfermedades</a>
+            </ul>
+              </div>
+              
+-->
+<!--        {% else %}-->
+
+         
+<!--           RANKING -->
+<!--
+          <div class="well">
+            <h1>RANKINGS: </h1>
+            <ul class="unstyled">
+            <li class="menu_ranking"><a href="/Marcas/Ranking">Marcas</a>
+            <li class="menu_ranking"><a href="/Medicamentos/Ranking">Medicamentos</a>
+            <li class="menu_ranking"><a href="/PrincipiosActivos/Ranking">Principios Activos</a>
+            <li class="menu_ranking"><a href="/Enfermedades/Ranking">Enfermedades</a>
+            <li class="menu_ranking"><a href="/ClasesTerapeuticas/Ranking">Clases Terapéuticas</a>
+            <li class="menu_ranking"><a href="/SubclasesTerapeuticas/Ranking">SubClases Terapéuticas</a>
+            </ul>
+            
+          </div>
+    {% endifequal %}
+        </div>
+-->
+
+        <!-- COLUMNA 2 CONTENIDO -->
+        <div class="span8 well_blank" >
+          {% block titulo %}{% endblock titulo %}
+          {% block adsense %}
+			<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+			<!-- Banner grande Venezuela -->
+			<ins class="adsbygoogle"
+				style="display:inline-block;width:336px;height:280px"
+				data-ad-client="ca-pub-5614045333408164"
+				data-ad-slot="4456511939"></ins>
+			<script>
+			(adsbygoogle = window.adsbygoogle || []).push({});
+			</script>
+
+          {% endblock %}
+
+          {% block contenido %}
+          {% endblock %}
+
+        </div>
+		<!-- COLUMNA 3 -->
+		<div class="span4">
+			{% block derecha %}
+			
+			<!--<a href="http://prxcontrolsolutions.com/contacto/" target="blank">
+				<img src="{{ STATIC_URL }}images/bannerVademecum2.gif" target="blank">
+			</a>-->
+
+			<!-- TOP 20 MARCAS -->
+			<div class="container span3_5 well">
+				<h2>TOP 20 MARCAS</h2>
+
+				<ol class="top20">
+				{% for marca in top20marcas %}
+		     {% ifequal pais "panama" %}
+		         <li><a href="/centro_america/panama/Marcas/{{marca.id_vademecum}}">{{marca.nombre_medicamento}}</a></li>
+            {% else %}
+
+		        <li><a href="/centro_america/panama/Marcas/{{marca.id_vademecum}}">{{marca.nombre_medicamento}}</a></li>
+            {% endifequal %}
+				{% endfor %}
+				</ol>
+			</div>
+
+			<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+			<!-- Cuadrado derecho Vademecum -->
+			<ins class="adsbygoogle"
+				style="display:inline-block;width:300px;height:250px"
+				data-ad-client="ca-pub-5614045333408164"
+				data-ad-slot="6401347136"></ins>
+			<script>
+			(adsbygoogle = window.adsbygoogle || []).push({});
+			</script>
+
+			{% endblock %}
+		</div>
+	</div>
+
+	{% block contenido_prx %}
+	{% endblock %}   
+	<br><br>
+<div class="page-header">
+  <h1>Apóyate en tu comunidad para conseguir medicamentos</h1>
+</div> 
+
+<div class="fb-like" data-href="http://prxvademecum.com/" data-layout="standard" data-action="like" data-show-faces="true" data-share="true"></div>  
+
+<div class="fb-comments" data-href="http://prxvademecum.com{{ request.path }}" data-width="900" data-
+numposts="10" data-colorscheme="light"></div>
+  
+</div>
+
+       
+   
+              
+                 
+           <center>
+            
+				<a href="http://prxcontrolsolutions.com" target="_blank">
+				<img src='{{ STATIC_URL }}images/prx_log.jpg' alt="PRX Control Solutions">
+				</a>
+				<br><br><br>              <br><br>
+<!--
+              
+              <small>
+                <br>Copyright © 2011.<br>Todos los derechos reservados.
+              </small>
+-->
+            </center>
+                
+              
+              
+        <footer>
+
+        <div class="foot-fixed-bottom">
+           <p style="position: absolute; padding-left:20px">
+            Vademecum otros paises:
+            <select style="width:100px" id="paises">
+              <option value="http://prxvademecum.com" >Venezuela</option>
+              <option value="http://prxvademecum.com.pa" >Panamá</option>
+              <option value="http://prxvademecum.us" selected>EEUU</option>
+<!--              <option value="http://prxvademecum.com.pa" >Ecuador</option>-->
+<!--              <option value="http://prxvademecum.com.pa" >Peru</option>-->
+            </select>
+            </p>
+            <p class="pull-right">
+                Copyright © 2011. Todos los derechos reservados. &nbsp;&nbsp;&nbsp;&nbsp;
+           <a href="http://twitter.com/prxvademecum"><img src="{{ STATIC_URL }}images/twitter.png" title="Síguenos en twitter" alt="Síguenos en twitter"></a>
+            <a href="http://www.facebook.com/pages/PRX-Consulting/254676987908007"><img src="{{ STATIC_URL }}images/facebook.png" title="Hazte fan en facebook" alt="facebook fanpage"></a>            
+            
+            <a href="http://prxcontrolsolutions.com/contacto/"><img src="{{ STATIC_URL }}images/gmail.png" title="Hazte fan en facebook" alt="contacto" style="width:30px; heigth:auto"></a>
+
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            
+            </p>
+        </div>
+
+    </footer>
+    
+    
+</body>
+</html>

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script type="text/javascript">
+	$(document).ready(function() {
+		$(".nav-tabs #blogs").addClass('active');
+	});
+</script>
+{% endblock %}
+
+
+{% block titulo %}
+	<h2>BLOGS DE SALUD:</h2>
+{% endblock %}
+{% block adsense %}{% endblock %}
+{% block contenido %}
+	<div class="lista">
+		<ul id="lista" class="lista-detalles">
+			<li><a href="http://lasaludylamedicina.blogspot.com/">LA SALUD Y LA MEDICINA</a></li>
+			<li><a href="http://www.blogdefarmacia.com">BLOG DE FARMACIA</a></li>
+			<li><a href="http://hospitaldigital.com">HOSPITAL DIGITAL</a></li>
+		</ul>
+	</div>
+
+{% endblock %}

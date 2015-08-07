@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block meta_title %}
+	{% if pais %}
+		<title>{% trans "Marca" %} {{ marca.nombre_medicamento }} - {{ pais.pais_nombre }}</title>
+	{% else %}
+		<title>{% trans "Marca" %} {{ marca.nombre_medicamento }}</title>
+	{% endif %}
+{% endblock %}  
+
+{% block description_block %}
+	<meta name="description" content="{% trans 'Descripción y todo acerca de' %} {{ marca.nombre_medicamento }}">
+{% endblock %}  
+
+{% block keywords_block %}
+	{% if keywords %}
+		<meta name="keywords" content="{{keywords}}{% if indicaciones and indicaciones.keywords %}, {{indicaciones.keywords}}{% endif %}">
+	{% else %}
+		<meta name="keywords" content="{% blocktrans with brand=marca.nombre_medicamento %}
+			Medicamento, precio del {{ brand }}, cuánto cuesta {{ brand }}, para qué enfermedades se usa {{ brand }}, 
+			para cuáles enfermedades se usa {{ brand }}, medicamentos relacionados, principio  activo del {{ brand }}, dónde consigo 
+			{{ brand }}, dónde compro {{ brand }}, sustitución del {{ brand }}, prescripción del {{ brand }}, indicaciones, uso, 
+			para qué sirve {{ brand }}, que es {{ brand }}, presentaciones de {{ brand }}, medicamentos, dosis de 
+			{{ brand }}, genérico {{ brand }}, efectos secundarios {{ brand }}, 
+			comprar, contraindicaciones {{ brand }}, componentes {{ brand }}, posología, 
+			reacciones adversas, ingrediente {{ brand }}{% endblocktrans %}}
+			{% if indicaciones and indicaciones.keywords %}, {{indicaciones.keywords}}{% endif %}">
+	{% endif %}
+
+<!--
+	{% if marca.keywords %}
+	<meta name="keywords" content="precio del {{ marca.nombre_medicamento }}, cuánto cuesta {{ marca.nombre_medicamento }}, para qué enfermedades se usa {{ marca.nombre_medicamento }}, para cuáles enfermedades se usa {{ marca.nombre_medicamento }}, medicamentos relacionados, principio activo del {{ marca.nombre_medicamento }}, dónde consigo {{ marca.nombre_medicamento }}, dónde compro {{ marca.nombre_medicamento }}, sustitución del {{ marca.nombre_medicamento }}, prescripción del {{ marca.nombre_medicamento }}, indicaciones; uso; para qué sirve; presentaciones; medicamentos; dosis, genérico, efectos secundarios, comprar, medicamento, contraindicaciones, componentes, mexico; Canada; united states; Colombia; peru; hong Kong; medicamentos en Venezuela, farmacias en Venezuela, laboratorios de Venezuela, {{ marca.keywords }}. ">
+	{% else %}
+	<meta name="keywords" content="precio del {{ marca.nombre_medicamento }}, cuánto cuesta {{ marca.nombre_medicamento }}, para qué enfermedades se usa {{ marca.nombre_medicamento }}, para cuáles enfermedades se usa {{ marca.nombre_medicamento }}, medicamentos relacionados, principio activo del {{ marca.nombre_medicamento }}, dónde consigo {{ marca.nombre_medicamento }}, dónde compro {{ marca.nombre_medicamento }}, sustitución del {{ marca.nombre_medicamento }}, prescripción del {{ marca.nombre_medicamento }}, indicaciones; uso; para qué sirve; presentaciones; medicamentos; dosis, genérico, efectos secundarios, comprar, medicamento, contraindicaciones, componentes, mexico; Canada; united states; Colombia; peru; hong Kong; medicamentos en Venezuela, farmacias en Venezuela, laboratorios de Venezuela. ">
+	{% endif %}
+-->
+{% endblock %}         
+
+
+
+{% block scripts %}
+
+	<script type="text/javascript">
+
+		$(document).ready(function() {
+			$(".navbar-nav li").removeClass('active');
+			$(".navbar-nav #marcas").addClass('active');
+		});
+
+	</script>
+
+{% endblock %}
+
+{% block titulo %}
+	<div class="page-header">
+	<!--  <h1>Medicamento: {{ marca.nombre_medicamento }}</h1>-->
+	<h1>{{ marca.nombre_medicamento }}</h1>
+	</div>
+{% endblock %}
+
+{% block contenido %}
+
+	{% if indicaciones %}
+		{% if indicaciones.indicaciones %}
+			<br />
+			<h2>{% trans "Indicaciones" %}: </h2>
+			
+			<p align="justify">{{ indicaciones.indicaciones }}</p>
+		{% endif %} 
+	{% endif %}
+
+	{% if presentaciones %}
+		<h2>{% trans "Presentaciones" %}: </h2>
+		<p>
+			<ul class="lista-detalles">
+			{% for presentacion in presentaciones %}
+				<li><a href="/Medicamentos/{{presentacion.id_vademecum}}">{{ presentacion.nombre_presentacion }}</a></li>
+			{% endfor %}
+			</ul>
+		</p>
+	{% endif %} 
+
+	{% if principio %}
+		<h2>{% trans "Principio activo" %}: </h2>
+		<p>
+			<ul class="lista-detalles">
+				<li> <a href="/PrincipiosActivos/{{principio.id_vademecum}}">{{ principio.prigrup_nombre}}</a></li>
+			</ul>
+		</p>
+	{% endif %} 
+
+	{% if marcas %}
+		<h2>{% trans "Marcas relacionadas" %}: </h2>
+		<p>
+			<ul class="lista-detalles">
+			{% for marca in marcas %}
+				<li><a href="/Marcas/{{marca.id_vademecum}}">{{ marca.nombre_medicamento }}</a></li>
+			{% endfor %}
+			</ul>
+		</p>
+	{% endif %}
+  
+	{% if marca_pais %}
+		<h2>{% trans "Otros países" %}:</h2>
+		<p>
+		{% for marca_otros in marca_pais %}
+			<ul class="lista-detalles">
+				<li><a href="{{marca_otros.pais__link}}/Marcas/{{marca.id_vademecum}}">{{ marca_otros.id_medicamento__nombre_medicamento }} {% trans "en" %} {{ marca_otros.pais__pais_nombre }}</a></li>
+			</ul>
+		{% endfor %}
+		</p>
+	{% endif %}
+
+	{% if indicaciones %}
+		{% if indicaciones.contraindicaciones %}
+			<h2>{% trans "Contraindicaciones" %}: </h2>
+			<p  align="justify">{{ indicaciones.contraindicaciones }}</p>
+		{% endif %}
+
+		{% if indicaciones.posologia %}
+			<h2>{% trans "Posología" %}: </h2>
+			<p  align="justify">{{ indicaciones.posologia }}</p>
+		{% endif %}
+
+		{% if indicaciones.reacciones_adversas %}
+			<h2>{% trans "Reacciones adversas" %}: </h2>
+			<p  align="justify">{{ indicaciones.reacciones_adversas }}</p>
+		{% endif %}
+	{% endif %}
+
+{% endblock %}

@@ -1,0 +1,16 @@
+<div id="pagination-letters">
+	{% for letter in letters %}
+		<a href="{{ letter.ref }}" 
+			{% if letra %}
+				{% if letra == letter.ref %} class=active 
+				{% endif %}
+			{% endif %}
+			{% if otros %}
+				{% if otros == letter.ref %} class=active
+				{% endif %}
+			{% endif %} >{{ letter.show }}</a>
+	{% endfor %}
+</div>
+
+<img src="{{ STATIC_URL }}images/automedicacion.png">
+<div id="Pagination" class="pagination"><ul id="pagination" class="lista-detalles"></ul></div>

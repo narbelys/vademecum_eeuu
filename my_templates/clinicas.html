@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+  {% block meta_title %}
+  <title>Clínicas y hospitales de Venezuela</title>
+  <meta name="description" content="Directorio de clínicas, hospitales, ambulatorios y laboratorios de Venezuela con su dirección y teléfono ">
+  <meta name="keywords" content="clinicas de venezuela, hospitales de venezuela, ambulatorios de venezuela, laboratorios de venezuela, laboratorios clínicos de venezuela, centros de diagnóstico, directorio, dirección, teléfono, lista de clínicas, lista de hospitales ">  
+  {% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$(".nav-tabs #blogs").addClass('active');
+	});
+	
+
+	var directorio = []
+
+// 		$(".nav-tabs #enfermedades").addClass('active');
+
+		$('#lista').append('<img id="loader" style="display:block;margin-left:auto;margin-right:auto;" src="{{STATIC_URL}}images/loader-ajax.gif">');
+
+		$.ajax({
+			url: "/Clinicas/getClinicas",
+			data: { letra:{% if letra %}"{{letra}}"{% else %}''{% endif %} },
+			dataType: "json",
+			cache: false,
+			success: function(data) {
+// 				alert(JSON.stringify(data));
+				for(x in data){
+					directorio[x] = [data[x].fields.url_vademecum, data[x].fields.nombre_clinica];
+// 					alert(data)
+				}
+				
+// 				alert(JSON.strisngify(directorio));
+				return false;
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				if (errorThrown!="")	alert(errorThrown+' : '+textStatus);
+			},
+			crossDomain: false,
+			type: "POST",
+		})
+		.done(function(){paginar(directorio);},function(){ $('#loader').remove();});
+</script>
+{% endblock %}
+
+
+{% block titulo %}
+<div class="page-header">
+	<h2>CLÍNICAS Y HOSPITALES DE VENEZUELA:</h2>
+</div>
+{% endblock %}
+
+{% block contenido %}
+	<div class="lista">
+		<ul id="lista" class="lista-detalles">
+			{%for clinica in clinicas%}
+			<li><a href="/Clinicas/{{clinica.url_vademecum}}">{{clinica.nombre_clinica}}</a></li>
+			{%endfor%}
+		</ul>
+	</div>
+	
+	  {% include "elements/paginacion.html" %}
+
+{% endblock %}

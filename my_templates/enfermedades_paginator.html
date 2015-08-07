@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block meta_title %}
+	<meta name="description" content="{% trans 'Enfermedades' %}">
+	{% if pais.pais_nombre %}
+		<meta name="keywords" content="contenido de la página: directorio de enfermedades, Tipos de enfermedades; enfermedades de transmisión; enfermedades respiratorias; síntomas de enfermedades; enfermedades más comunes; enfermedades de piel; imágenes de enfermedades; fotos de enfermedades; tratamiento enfermedades; como prevenir enfermedades, medicamentos en {{ pais.pais_nombre }}, farmacias en {{ pais.pais_nombre }}, laboratorios de {{ pais.pais_nombre }}. ">
+	{% else %}
+		<meta name="keywords" content="contenido de la página: directorio de enfermedades, Tipos de enfermedades; enfermedades de transmisión; enfermedades respiratorias; síntomas de enfermedades; enfermedades más comunes; enfermedades de piel; imágenes de enfermedades; fotos de enfermedades; tratamiento enfermedades; como prevenir enfermedades, medicamentos, farmacias, laboratorios. ">
+	{% endif %}
+
+	<title>PRX Vademécum - {% trans "Enfermedades" %}</title>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		$(".navbar-nav li").removeClass('active');
+		$(".navbar-nav #enfermedades").addClass('active');
+	});
+
+</script>
+
+{% endblock %}
+
+{% block titulo %}
+<div class="page-header">
+	<h2>{% trans "ENFERMEDADES" %}:</h2>
+</div>
+{% endblock %}
+
+{% block contenido %}
+
+	
+	{% if enfermedades %}
+		<div class="lista">
+			<ul id="lista" class="lista-detalles">
+			{% for enfermedad in enfermedades %}
+				<li><a href="../Enfermedades/{{enfermedad.id_vademecum}}">{{enfermedad.nombre_diagnostico}}</a></li>
+			{% endfor %}
+			</ul>
+		</div>
+	{% else %}
+		{% include "elements/no_matches_found.html" %}
+	{% endif %}
+
+	{% block paginacion_menu %}
+		{% if enfermedades %}
+			<div class="pagination">
+				<ul>
+					{% if enfermedades.has_previous %}
+						<li><a class="page_button" href="?page={{ enfermedades.previous_page_number }}">«</a></li>
+					{% else %}
+						<li class="disabled"><a class="not_clickable" href="#">«</a></li>
+					{% endif %}
+					{% for page in pags %}
+						{% if page == enfermedades.number %}
+							<li><a class="page_button" href="?page={{ enfermedades.number }}"><strong>{{ enfermedades.number }}</strong></a></li>
+						{% elif page == '...'  %}
+							<li class="disabled"><a class="not_clickable" href="#">{{ page }}</a></li>
+						{% else %}
+							<li><a class="page_button" href="?page={{ page }}">{{ page }}</a></li>
+						{% endif %}
+					{% endfor %}
+					{% if enfermedades.has_next %}<li><a class="page_button" href="?page={{ enfermedades.next_page_number }}">»</a>
+					{% else %}<li class="disabled"><a class="not_clickable" href="#">»</a>
+					{% endif %}</li>
+				</ul>
+			</div>
+			<div class="current">
+				{% trans "Página" %} {{ enfermedades.number }} {% trans "de" %} {{ enfermedades.paginator.num_pages }}.
+			</div>
+		{% endif %}
+	{% endblock %}
+
+	{% include "elements/paginacion_amplia.html" %}
+
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block scripts %}
+	<script type="text/javascript">
+
+		$(document).ready(function() {
+			$(".nav-tabs #home").addClass('active');
+		});
+
+	</script>
+{% endblock %}
+
+{% block adsense %}{% endblock %}
+{% block contenido %}
+
+	<!-- 
+	<div class="container span8">
+	<div class="page-header">
+	<h2>TOP 10 MEDICAMENTOS</h2>
+	</div>
+
+	<ul class="top10 lista-detalles" >
+		{% for med in meds %}
+		<li><a href="/Medicamentos/{{med.medicamento.id_vademecum}}">{{med.medicamento.nombre_presentacion}}</a></li>
+		{% endfor %}
+	</ul>
+	<p><a href="/Medicamentos/Ranking">Ver más...</a></p>
+	</div>
+	-->
+	
+	<div class="container col-md-8">
+	{% if idioma.iso_alpha == 'EN' %}
+		<div class="page-header">
+			<h2>TOP 20 {% trans "MEDICAMENTOS" %} </h2>
+		</div>
+
+		<ul class="top10 lista-detalles" >
+			{% for med in meds %}
+			<li><a href="/Medicamentos/{{med.id_vademecum}}">{{med.nombre_presentacion}}</a></li>
+			{% endfor %}
+		</ul>
+	{% else %}
+		<div class="page-header">
+			<h2>TOP 20 {% trans "ENFERMEDADES" %} </h2>
+		</div>
+
+		<ul class="top10 lista-detalles">
+			{% for enf in enfs %}
+				<li><a href="/Enfermedades/{{enf.enfermedad.id_vademecum}}">{{enf.enfermedad.nombre_diagnostico}}</a></li>
+			{% endfor %}
+		</ul>
+		<a href="/Enfermedades/Ranking">{% trans "Ver más" %}...</a>
+	{% endif %}
+		
+	</div>
+
+{% endblock %}
+
+
+{% block contenido_header %}
+	<blockquote style="border-left: 5px solid #3a87ad;">
+		<p>{% trans "PRX Vademécum es un directorio gratuito que reúne información actualizada sobre medicamentos, ingredientes activos, enfermedades y mucho más. En nuestro vademécum podrá consultar indicaciones, contraindicaciones, presentaciones y reacciones adversas de los medicamentos presentes en el mercado." %} </p>
+	</blockquote>
+
+	<div class="alert">
+	<strong>{% trans "ADVERTENCIA" %}: </strong>{% trans "El contenido presente en esta página es con fines informativos y la correcta interpretación requiere de formación especializada. Evite la automedicación, consulte a su médico." %}
+	</div>
+{% endblock %}
+
+{% block contenido_prx %}
+	<!--<div class="row content-prx" >
+		<div class="page-header">
+			<h1 class="title">Inteligencia de negocios aplicada a servicios de salud</h1>
+		</div>
+		<blockquote class="content-text" >
+			<p>
+			PRX Control Solutions es una empresa dedicada al diseño de soluciones tecnológicas para el sector salud, farmacéutico y asegurador.
+			Los productos y servicios de PRX Control Solutions están dirigidos al control y supervisión de prescripciones farmacológicas y de la salud de los pacientes.
+			En PRX Control Solutions solucionamos 3 problemas: la falta de control sobre el consumo de tratamientos farmacológicos, del seguimiento de la salud de los pacientes y de la data necesaria para que el mercado de la salud tome mejores decisiones y cree programas para mejorar la vida de los seres humanos. </p>
+		</blockquote> 
+		<iframe width="940" height="500" src="//www.youtube.com/embed/FjgOK9Ku800?autohide=1&amp;version=3&amp;autoplay=1enablejsapi=1″ frameborder=" allowfullscreen=""></iframe>      
+	</div>-->
+{% endblock %}
+
+{% block derecha %}
+
+	<!-- TOP 20 MARCAS -->
+	<div class="container col-md-11 well">
+		<h2>TOP 20 {% trans "MARCAS" %}</h2>
+		<ol class="top20">
+		{% for marca in top20marcas %}
+			{% if marca.nombre_medicamento|length > 15 %}
+			<li><a href="/Marcas/{{marca.id_vademecum}}">{{marca.nombre_medicamento|slice:":14"}}...</a></li>
+			{% else %}
+				<li><a href="/Marcas/{{marca.id_vademecum}}">{{marca.nombre_medicamento}}</a></li>
+			{% endif %}
+		{% endfor %}
+		</ol>
+	</div>
+	
+	<br>
+	
+	<!-- BANNER DERECHO -->
+	{% if pais.iso_alpha == 'VE' %} {% include "elements/banners/venezuela_derecho.html" %}
+	{% elif pais.iso_alpha == 'US' %} {% include "elements/banners/eeuu_derecho.html" %}
+	{% elif pais.iso_alpha == 'PA' %} {% include "elements/banners/panama_derecho.html" %}
+	{% elif pais.iso_alpha == 'EC' %} {% include "elements/banners/ecuador_derecho.html" %}
+	{% elif pais.iso_alpha == 'PE' %} {% include "elements/banners/peru_derecho.html" %}
+	{% elif pais.iso_alpha == 'CO' %} {% include "elements/banners/colombia_derecho.html" %}
+	{% elif pais.iso_alpha == 'ES' %} {% include "elements/banners/espania_derecho.html" %}
+	{% else %} {% include "elements/banners/venezuela_derecho.html" %} <!-- Venezuela por defecto -->
+	{% endif %}
+	<!-- FIN BANNER DERECHO -->
+
+{% endblock %}
+

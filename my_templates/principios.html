@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block meta_title %}
+	<meta name="description" content="Principios Activos">
+
+	{% if pais.pais_nombre %}
+		<meta name="keywords" content="principios activos de {{ pais.pais_nombre }}, ingredientes activos de {{ pais.pais_nombre }}, marcas de ingredientes activos de {{ pais.pais_nombre }}, marcas de princpios activos de {{ pais.pais_nombre }}, ingredientes activos en {{ pais.pais_nombre }}, principios activos en {{ pais.pais_nombre }}, lista de principios activos en {{ pais.pais_nombre }}, ingredientes de medicamentos, contenido de la página: directorio de principios activos, medicamentos en {{ pais.pais_nombre }}, farmacias en {{ pais.pais_nombre }}, laboratorios de {{ pais.pais_nombre }}. ">
+	{% else %}
+		<meta name="keywords" content="principios activos de {{ pais.pais_nombre }}, ingredientes activos de {{ pais.pais_nombre }}, marcas de ingredientes activos de {{ pais.pais_nombre }}, marcas de princpios activos de {{ pais.pais_nombre }}, ingredientes activos en {{ pais.pais_nombre }}, principios activos en {{ pais.pais_nombre }}, lista de principios activos en {{ pais.pais_nombre }}, ingredientes de medicamentos, contenido de la página: directorio de principios activos, medicamentos en {{ pais.pais_nombre }}, farmacias en {{ pais.pais_nombre }}, laboratorios de {{ pais.pais_nombre }}. ">
+	{% endif %}
+
+	<title>PRX Vademécum - Principios Activos</title>
+{% endblock %}
+
+{% block scripts %}
+
+	<script type="text/javascript">
+
+		var directorio = []
+
+		$(function() {
+            $(".navbar-nav li").removeClass('active');
+			$(".navbar-nav #principios").addClass('active');
+
+			$('#lista').append('<img id="loader" style="display:block;margin-left:auto;margin-right:auto;" src="{{STATIC_URL}}images/loader-ajax.gif">');
+
+			$.ajax({
+				url: "/PrincipiosActivos/getPrincipios",
+				data: { letra:{% if letra %}"{{letra}}"{% else %}''{% endif %} },
+				dataType: "json",
+				success: function(data) {
+
+				for(x in data){
+					directorio[x] = [data[x].fields.id_vademecum, data[x].fields.prigrup_nombre];
+				}
+					//alert(JSON.stringify(directorio));
+					return false;
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					if (errorThrown!="")	alert(errorThrown+' : '+textStatus);
+				},
+				crossDomain: false,
+				type: "POST",
+			}).done(function(){paginar(directorio);},function(){ $('#loader').remove();});
+		});
+
+	</script>
+
+{% endblock %}
+
+{% block titulo %}
+	<div class="page-header">
+		<h2>PRINCIPIOS ACTIVOS:</h5>
+	</div>
+{% endblock %}
+
+{% block contenido %}
+
+	<div class="lista">
+		<ul id="lista" class="lista-detalles">
+		</ul>
+	</div>
+
+  {% include "elements/paginacion.html" %}
+
+{% endblock %}

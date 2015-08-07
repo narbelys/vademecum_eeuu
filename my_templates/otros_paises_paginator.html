@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block scripts %}
+
+	<script type="text/javascript">
+			var static_url = "{{ STATIC_URL }}";
+	</script>
+
+	<script type="text/javascript">
+
+		var directorio = []
+
+		$(document).ready(function() {
+			$(".navbar-nav li").removeClass('active');
+			$(".navbar-nav #otros_paises").addClass('active');
+		});
+
+	</script>
+
+{% endblock %}
+
+{% block titulo %}
+	<div class="page-header">
+		<h2>{% trans "MARCAS OTROS PAISES" %}:</h2>
+	</div>
+	
+{% endblock %}
+{% block contenido %}
+
+	{% if marcas %}
+		<table style="width:100%" class="table" id="lista">
+			{% for marca in marcas %}
+				<tr id="lista" class="lista-detalles">
+					<td>{{marca.0}}</td>
+					<td>
+						{% for bandera in marca.1 %}
+							<a href="{{ bandera.link }}/Marcas/{{ bandera.url }}" title="{{marca.0}} {{bandera.nombre}}">
+								<img src="{{ STATIC_URL }}images/banderas/{{bandera.flag}}" alt='flag'>
+							</a>
+						{% endfor %}
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+	{% else %}
+		<div class="current">
+			{% include "elements/no_matches_found.html" %}
+		</div>
+	{% endif %}
+
+	{% block paginacion_menu %}
+		{% if marcas %}
+			<div class="pagination">
+				<ul>
+					{% if marcas.has_previous %}
+						<li><a class="page_button" href="?page={{ marcas.previous_page_number }}">«</a></li>
+					{% else %}
+						<li class="disabled"><a class="not_clickable" href="#">«</a></li>
+					{% endif %}
+					{% for page in pags %}
+						{% if page == marcas.number %}
+							<li><a class="page_button" href="?page={{ marcas.number }}"><strong>{{ marcas.number }}</strong></a></li>
+						{% elif page == '...'  %}
+							<li class="disabled"><a class="not_clickable" href="#">{{ page }}</a></li>
+						{% else %}
+							<li><a class="page_button" href="?page={{ page }}">{{ page }}</a></li>
+						{% endif %}
+					{% endfor %}
+					{% if marcas.has_next %}<li><a class="page_button" href="?page={{ marcas.next_page_number }}">»</a>
+					{% else %}<li class="disabled"><a class="not_clickable" href="#">»</a>
+					{% endif %}</li>
+				</ul>
+			</div>
+			<div class="current">
+				{% trans "Página" %} {{ marcas.number }} {% trans "de" %} {{ marcas.paginator.num_pages }}.
+			</div>
+		{% endif %}
+	{% endblock %}
+
+	{% include "elements/paginacion_amplia.html" %}
+
+{% endblock %}

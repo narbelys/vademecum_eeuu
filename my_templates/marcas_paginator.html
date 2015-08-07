@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block scripts %}
+
+	<script type="text/javascript">
+
+		$(document).ready(function() {
+			$(".navbar-nav li").removeClass('active');
+			$(".navbar-nav #marcas").addClass('active');
+		});
+
+	</script>
+
+{% endblock %}
+
+{% block titulo %}
+	<div class="page-header">
+		<h2>{% trans "MARCAS" %}:</h2>
+	</div>
+	
+{% endblock %}
+{% block contenido %}
+
+	
+	{% if marcas %}
+		<div class="lista">
+			<ul id="lista" class="lista-detalles">
+			{% for marca in marcas %}
+				<li><a href="../Marcas/{{marca.id_vademecum}}">{{marca.nombre_medicamento}}</a></li>
+			{% endfor %}
+			</ul>
+		</div>
+	{% else %}
+		{% include "elements/no_matches_found.html" %}
+	{% endif %}
+
+	{% block paginacion_menu %}
+		{% if marcas %}
+			<div class="pagination">
+				<ul>
+					{% if marcas.has_previous %}
+						<li><a class="page_button" href="?page={{ marcas.previous_page_number }}">«</a></li>
+					{% else %}
+						<li class="disabled"><a class="not_clickable" href="#">«</a></li>
+					{% endif %}
+					{% for page in pags %}
+						{% if page == marcas.number %}
+							<li><a class="page_button" href="?page={{ marcas.number }}"><strong>{{ marcas.number }}</strong></a></li>
+						{% elif page == '...'  %}
+							<li class="disabled"><a class="not_clickable" href="#">{{ page }}</a></li>
+						{% else %}
+							<li><a class="page_button" href="?page={{ page }}">{{ page }}</a></li>
+						{% endif %}
+					{% endfor %}
+					{% if marcas.has_next %}<li><a class="page_button" href="?page={{ marcas.next_page_number }}">»</a>
+					{% else %}<li class="disabled"><a class="not_clickable" href="#">»</a>
+					{% endif %}</li>
+				</ul>
+			</div>
+			<div class="current">
+				{% trans "Página" %} {{ marcas.number }} {% trans "de" %} {{ marcas.paginator.num_pages }}.
+			</div>
+		{% endif %}
+	{% endblock %}
+
+	{% include "elements/paginacion_amplia.html" %}
+
+{% endblock %}

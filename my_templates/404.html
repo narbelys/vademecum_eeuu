@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Página no encontrada{% endblock %}
+
+{% block pagetitle %}Página no encontrada{% endblock %}
+{% block scripts %}
+<script type="text/javascript">
+
+    $(document).ready(function() {
+           $(".nav-tabs #home").addClass('active');
+    });
+
+</script>
+{% endblock %}
+
+{% block adsense %}{% endblock %}
+
+{% block contenido %}
+<div style="clear:both; margin-top:0px; font-size:x-large; text-align:center; font-weight:bold; color:#000"><p>Error 404</p></div>
+<div style="margin-left:-60px; padding-top:15px; width:520px; clear:both; text-align:center; font-size:13px; font-weight:normal; color:#000">
+	<p>Ha sido imposible encontrar la página solicitada.</p>
+	<p>Disculpe las molestias.</p>
+</div>
+<div style="margin-left:431px; margin-top:40px;"></div>
+{% endblock %}
+
+{% block derecha %}
+              <script type="text/javascript"><!--
+              google_ad_client = "ca-pub-7350737319976443";
+              /* Cuadrado */
+              google_ad_slot = "8603009044";
+              google_ad_width = 300;
+              google_ad_height = 250;
+              //-->
+              </script>
+              <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+              </script>
+              <br>
+
+{% endblock %}

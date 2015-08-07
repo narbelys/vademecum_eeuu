@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block meta_title %}
+	<title>Clínicas y hospitales de Venezuela</title>
+	<meta name="description" content="Directorio de clínicas, hospitales, ambulatorios y laboratorios de Venezuela con su dirección y teléfono ">
+	<meta name="keywords" content="clinicas de venezuela, hospitales de venezuela, ambulatorios de venezuela, laboratorios de venezuela, laboratorios clínicos de venezuela, centros de diagnóstico, directorio, dirección, teléfono, lista de clínicas, lista de hospitales ">  
+{% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$(".navbar-nav li").removeClass('active');
+		$(".navbar-nav #blogs").addClass('active');
+	});
+	
+</script>
+{% endblock %}
+
+
+{% block titulo %}
+<div class="page-header">
+	<h2>CLÍNICAS Y HOSPITALES DE VENEZUELA:</h2>
+</div>
+{% endblock %}
+
+{% block contenido %}
+
+	
+	{% if clinicas %}
+		<div class="lista">
+			<ul id="lista" class="lista-detalles">
+			{% for clinic in clinicas %}
+				<li><a href="../Clinicas/{{clinic.url_vademecum}}">{{clinic.nombre_clinica}}</a></li>
+			{% endfor %}
+			</ul>
+		</div>
+	{% else %}
+		{% include "elements/no_matches_found.html" %}
+	{% endif %}
+
+	{% block paginacion_menu %}
+		{% if clinicas %}
+			<div class="pagination">
+				<ul>
+					{% if clinicas.has_previous %}
+						<li><a class="page_button" href="?page={{ clinicas.previous_page_number }}">«</a></li>
+					{% else %}
+						<li class="disabled"><a class="not_clickable" href="#">«</a></li>
+					{% endif %}
+					{% for page in pags %}
+						{% if page == clinicas.number %}
+							<li><a class="page_button" href="?page={{ clinicas.number }}"><strong>{{ clinicas.number }}</strong></a></li>
+						{% elif page == '...'  %}
+							<li class="disabled"><a class="not_clickable" href="#">{{ page }}</a></li>
+						{% else %}
+							<li><a class="page_button" href="?page={{ page }}">{{ page }}</a></li>
+						{% endif %}
+					{% endfor %}
+					{% if clinicas.has_next %}<li><a class="page_button" href="?page={{ clinicas.next_page_number }}">»</a>
+					{% else %}<li class="disabled"><a class="not_clickable" href="#">»</a>
+					{% endif %}</li>
+				</ul>
+			</div>
+			<div class="current">
+				{% trans "Página" %} {{ clinicas.number }} {% trans "de" %} {{ clinicas.paginator.num_pages }}.
+			</div>
+		{% endif %}
+	{% endblock %}
+
+	{% include "elements/paginacion_amplia.html" %}
+
+{% endblock %}

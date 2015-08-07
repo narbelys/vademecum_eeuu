@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block meta_title %}
+
+	{% if pais %}
+		<title>{% trans "Laboratorio" %} {{ lab.nombre_laboratorio }} - {{pais.pais_nombre}}</title>
+	{% else %}
+		<title>{% trans "Laboratorio" %} {{ lab.nombre_laboratorio }}</title>
+	{% endif %}
+
+	<meta name="description" content="{% trans 'Descripción y todo acerca de' %} {{ lab.nombre_laboratorio }}">
+	<meta name="keywords" content="{% trans 'Laboratorio' %} {{ lab.nombre_laboratorio }}">
+{% endblock %}
+
+{% block scripts %}
+
+	<script type="text/javascript">
+
+		var directorio = []
+
+		$(document).ready(function() {
+
+			$('#lista').append('<img id="loader" style="display:block;margin-left:auto;margin-right:auto;" src="{{STATIC_URL}}images/loader-ajax.gif">');
+
+			$.ajax({
+				url: "/Laboratorios/getMeds",
+				data: { id_lab:{% if lab %}"{{lab.id_laboratorio}}"{% else %}''{% endif %} },
+				dataType: "json",
+				success: function(data) {
+
+				for(x in data){
+					directorio[x] = [ "/Medicamentos/"+data[x].fields.id_vademecum, data[x].fields.nombre_presentacion];
+				}
+					//alert(JSON.stringify(directorio));
+					return false;
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					if (errorThrown!="")	alert(errorThrown+' : '+textStatus);
+				},
+				crossDomain: false,
+				type: "POST",
+			}).done(function(){paginar(directorio);},function(){ $('#loader').remove();});
+		});
+
+	</script>
+
+{% endblock %}
+
+{% block titulo %}
+	<div class="page-header">
+		<!--  <h1>Laboratorio: {{ lab.nombre_laboratorio }}</h1>-->
+		<h2>{{ lab.nombre_laboratorio }}</h2>
+	</div>
+{% endblock %}
+
+{% block contenido %}
+
+	{% if lab.logo %}
+		<div>
+			<img src="{{ STATIC_URL }}images/laboratorios/{{lab.logo }}" alt="{{ lab.nombre_laboratorio }}">
+		</div>
+	{% endif %}
+	{% if lab.website %}
+		<div>
+			<h2>{% trans "LABORATORIO" %}</h2>
+			<ul class="lista-detalles">
+				<li><a href="{{ lab.website }}" target="_blank" >{{ lab.nombre_laboratorio }}</a></li>
+			</ul>
+		</div>
+	{% else %}
+		<div>
+			<h2>{% trans "LABORATORIO" %}</h2>
+			<ul class="lista-detalles">
+				<li>{{ lab.nombre_laboratorio }}</li>
+			</ul>
+		</div>
+	{% endif %}
+
+	<h2>{% trans "MEDICAMENTOS" %}:</h2>
+
+	<div class="lista">
+		<ul id="lista" class="lista-detalles">
+		</ul>
+	</div>
+
+	{% include "elements/paginacion.html" %}
+
+{% endblock %}
